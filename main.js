@@ -59,7 +59,7 @@ function jobs() {
                                 creep.moveTo(exTarget)
                             }
                         } else {
-                            let towers = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER && store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
+                            let towers = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter:  (s) => { s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
                             if (towers) {
                                 if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                     creep.moveTo(towers)
@@ -244,6 +244,7 @@ function defendRoom(myRoomName) {
     if (towers) {
         //if there are hostiles - attakc them    
         if (hostiles.length > 0) {
+            Game.rooms[myRoomName].controller.activateSafeMode();
             let username = hostiles[0].owner.username;
             Game.notify(`User ${username} spotted in room ${myRoomName}`);
             towers.forEach(tower => tower.attack(hostiles[0]));
