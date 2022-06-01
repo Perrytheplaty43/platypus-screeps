@@ -6,7 +6,7 @@ let builder = [MOVE, MOVE, CARRY, CARRY, CARRY, WORK, WORK, WORK]
 
 let upgrader = [MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK]
 
-let wall = 5000
+let wall = 10000
 
 module.exports.loop = function () {
     if (Game.cpu.bucket == 10000) {
@@ -59,9 +59,10 @@ function jobs() {
                                 creep.moveTo(exTarget)
                             }
                         } else {
-                            let towers = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter:  (s) => { s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
+                            let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter:  (s) => { return(s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 )} });
+                            
                             if (towers) {
-                                if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                if (creep.transfer(towers, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                     creep.moveTo(towers)
                                 }
                             } else {
@@ -79,7 +80,7 @@ function jobs() {
                             }
                         }
                     } else {
-                        let towers = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER && store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
+                        let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
                         if (towers) {
                             if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(towers)
@@ -264,13 +265,13 @@ function defendRoom(myRoomName) {
 
             for (let i in towers) {
                 //...repair Buildings! :) But ONLY until HALF the energy of the tower is gone.
-                //Because we don't want to be exposed if something shows up at our door :)
-                if (towers.energy > ((towers.energyCapacity / 10) * 9)) {
+                //Because we don't want to be exposed if something shows up at our door :
+                if (towers[i].store[RESOURCE_ENERGY]> towers[i].store.getCapacity(RESOURCE_ENERGY) / 2) { 
 
                     //Find the closest damaged Structure
-                    let closestDamagedStructure = towers.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART });
+                    let closestDamagedStructure = towers[i].pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) =>{ return(s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) }})
                     if (closestDamagedStructure) {
-                        towers.repair(closestDamagedStructure);
+                        towers[i].repair(closestDamagedStructure);
                     }
                 }
             }
