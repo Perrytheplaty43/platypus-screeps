@@ -13,6 +13,7 @@ module.exports.loop = function () {
         Game.cpu.generatePixel();
     }
     jobs()
+    defendRoom('W51S37')
 }
 
 function jobs() {
@@ -58,6 +59,32 @@ function jobs() {
                                 creep.moveTo(exTarget)
                             }
                         } else {
+                            let towers = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER && store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
+                            if (towers) {
+                                if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(towers)
+                                }
+                            } else {
+                                let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
+                                    {
+                                        filter: (s) => {
+                                            return (s.structureType == STRUCTURE_CONTAINER)
+                                        }
+                                    });
+                                if (conainterTarget) {
+                                    if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                        creep.moveTo(conainterTarget)
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        let towers = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER && store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
+                        if (towers) {
+                            if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(towers)
+                            }
+                        } else {
                             let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
                                 {
                                     filter: (s) => {
@@ -68,18 +95,6 @@ function jobs() {
                                 if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                     creep.moveTo(conainterTarget)
                                 }
-                            }
-                        }
-                    } else {
-                        let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
-                            {
-                                filter: (s) => {
-                                    return (s.structureType == STRUCTURE_CONTAINER)
-                                }
-                            });
-                        if (conainterTarget) {
-                            if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(conainterTarget)
                             }
                         }
                     }
@@ -219,5 +234,46 @@ function jobs() {
         spawn.spawnCreep(builder, 'builder' + id)
     } else if (upgradersCount < 3) {
         spawn.spawnCreep(upgrader, 'upgrader' + id)
+    }
+}
+
+function defendRoom(myRoomName) {
+    let hostiles = Game.rooms[myRoomName].find(FIND_HOSTILE_CREEPS);
+    let towers = Game.rooms[myRoomName].find(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER } });
+
+    if (towers) {
+        //if there are hostiles - attakc them    
+        if (hostiles.length > 0) {
+            let username = hostiles[0].owner.username;
+            Game.notify(`User ${username} spotted in room ${myRoomName}`);
+            towers.forEach(tower => tower.attack(hostiles[0]));
+        }
+
+        //if there are no hostiles....
+        if (hostiles.length === 0) {
+
+            //....first heal any damaged creeps
+            for (let name in Game.creeps) {
+                // get the creep object
+                let creep = Game.creeps[name];
+                if (creep.hits < creep.hitsMax) {
+                    towers.forEach(tower => tower.heal(creep));
+                }
+            }
+
+            for (let i in towers) {
+                //...repair Buildings! :) But ONLY until HALF the energy of the tower is gone.
+                //Because we don't want to be exposed if something shows up at our door :)
+                if (towers.energy > ((towers.energyCapacity / 10) * 9)) {
+
+                    //Find the closest damaged Structure
+                    let closestDamagedStructure = towers.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART });
+                    if (closestDamagedStructure) {
+                        towers.repair(closestDamagedStructure);
+                    }
+                }
+            }
+
+        }
     }
 }
