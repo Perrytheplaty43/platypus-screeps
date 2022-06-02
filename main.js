@@ -1,4 +1,15 @@
-let farmer = [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE]
+const data = {
+    "Spawn1": {
+        farmer : [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE],
+        carrier : [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder : [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK],
+        upgrader : [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK],
+        defenderHi : [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+        defenderLo : [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
+        wall : 10000,
+    }
+}
+//let farmer = [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE]
 
 let carrier = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
 
@@ -15,16 +26,16 @@ module.exports.loop = function () {
     if (Game.cpu.bucket == 10000) {
         Game.cpu.generatePixel();
     }
-    jobs()
+    jobs('Spawn1')
     defendRoom('W51S37')
 }
 
-function jobs() {
+function jobs(spawnName) {
     let farmersCount = 0;
     let carriersCount = 0;
     let buildersCount = 0;
     let upgradersCount = 0;
-    let spawn = Game.spawns['Spawn1'];
+    let spawn = Game.spawns[spawnName];
     for (let creepname in Game.creeps) {
         if (creepname.includes('farmer')) {
             let creep = Game.creeps[creepname]
@@ -53,6 +64,13 @@ function jobs() {
                         if (ruin) {
                             if (creep.withdraw(ruin, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(ruin)
+                            }
+                        } else {
+                            let tomb = creep.pos.findClosestByPath(FIND_TOMBSTONES, { filter: (s) => {return s.store[RESOURCE_ENERGY] > 100}})
+                            if (tomb) {
+                                if(creep.withdraw(tomb, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(tomb)
+                                }
                             }
                         }
                     }
@@ -244,6 +262,7 @@ function jobs() {
         }
     }
     let id = Math.floor(1000 + Math.random() * 9000);
+    a
     if (farmersCount < 3) {
         spawn.spawnCreep(farmer, 'farmer' + id)
     } else if (carriersCount < 2) {
