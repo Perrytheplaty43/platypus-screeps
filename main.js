@@ -6,7 +6,7 @@ const data = {
         upgrader: [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
-        wall: 10000,
+        wall: 20000,
         spawns: ['Spawn1']
     }
 }
