@@ -1,41 +1,30 @@
 const data = {
-    "Spawn1": {
-        farmer : [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE],
-        carrier : [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder : [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK],
-        upgrader : [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK],
-        defenderHi : [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
-        defenderLo : [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
-        wall : 10000,
+    "W51S37": {
+        farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK],
+        upgrader: [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK],
+        defenderHi: [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+        defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
+        wall: 10000,
+        spawns: ['Spawn1']
     }
 }
-//let farmer = [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE]
-
-let carrier = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
-
-let builder = [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK]
-
-let upgrader = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK]
-
-let defenderHi = [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH]
-let defenderLo = [MOVE, ATTACK, ATTACK, ATTACK, TOUGH]
-
-let wall = 10000
 
 module.exports.loop = function () {
     if (Game.cpu.bucket == 10000) {
         Game.cpu.generatePixel();
     }
-    jobs('Spawn1')
-    defendRoom('W51S37')
+    jobs('W51S37')
+    defendRoom('W51S37', 'Spawn1')
 }
 
-function jobs(spawnName) {
+function jobs(roomName) {
     let farmersCount = 0;
     let carriersCount = 0;
     let buildersCount = 0;
     let upgradersCount = 0;
-    let spawn = Game.spawns[spawnName];
+    let spawn = Game.spawns[data[roomName].spawns[0]];
     for (let creepname in Game.creeps) {
         if (creepname.includes('farmer')) {
             let creep = Game.creeps[creepname]
@@ -66,9 +55,9 @@ function jobs(spawnName) {
                                 creep.moveTo(ruin)
                             }
                         } else {
-                            let tomb = creep.pos.findClosestByPath(FIND_TOMBSTONES, { filter: (s) => {return s.store[RESOURCE_ENERGY] > 100}})
+                            let tomb = creep.pos.findClosestByPath(FIND_TOMBSTONES, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 100 } })
                             if (tomb) {
-                                if(creep.withdraw(tomb, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                if (creep.withdraw(tomb, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                     creep.moveTo(tomb)
                                 }
                             }
@@ -136,7 +125,7 @@ function jobs(spawnName) {
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                     let rampTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
                         {
-                            filter: (s) => (s.structureType == STRUCTURE_RAMPART && s.hits < wall)
+                            filter: (s) => (s.structureType == STRUCTURE_RAMPART && s.hits < data[roomName].wall)
                         })
                     if (rampTarget) {
                         if (creep.repair(rampTarget) == ERR_NOT_IN_RANGE) {
@@ -156,7 +145,7 @@ function jobs(spawnName) {
                                     });
                                 let repairWall = creep.pos.findClosestByPath(FIND_STRUCTURES,
                                     {
-                                        filter: (s) => (s.structureType == STRUCTURE_WALL && s.hits < wall)
+                                        filter: (s) => (s.structureType == STRUCTURE_WALL && s.hits < data[roomName].wall)
 
                                     });
                                 let closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
@@ -171,6 +160,10 @@ function jobs(spawnName) {
                                 } else if (closestDamagedStructure) {
                                     if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
                                         creep.moveTo(closestDamagedStructure)
+                                    }
+                                } else if (creep.room.controller) {
+                                    if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                                        creep.moveTo(creep.room.controller);
                                     }
                                 }
                             } else {
@@ -262,15 +255,14 @@ function jobs(spawnName) {
         }
     }
     let id = Math.floor(1000 + Math.random() * 9000);
-    a
     if (farmersCount < 3) {
-        spawn.spawnCreep(farmer, 'farmer' + id)
+        spawn.spawnCreep(data[roomName].farmer, 'farmer' + id)
     } else if (carriersCount < 2) {
-        spawn.spawnCreep(carrier, 'carrier' + id)
+        spawn.spawnCreep(data[roomName].carrier, 'carrier' + id)
     } else if (buildersCount < 3) {
-        spawn.spawnCreep(builder, 'builder' + id)
+        spawn.spawnCreep(data[roomName].builder, 'builder' + id)
     } else if (upgradersCount < 3) {
-        spawn.spawnCreep(upgrader, 'upgrader' + id)
+        spawn.spawnCreep(data[roomName].upgrader, 'upgrader' + id)
     }
 }
 
@@ -283,10 +275,10 @@ function defendRoom(myRoomName) {
         if (hostiles.length > 0) {
             Game.rooms[myRoomName].controller.activateSafeMode();
             let id = Math.floor(1000 + Math.random() * 9000);
-            if (Game.spawns['Spawn1'].canCreateCreep(defenderHi, 'defender' + id) == OK) {
-                Game.spawns['Spawn1'].createCreep(defenderHi, 'defender' + id);
+            if (Game.spawns[data[myRoomName].spawns[0]].canCreateCreep(data[myRoomName].defenderHi, 'defender' + id) == OK) {
+                Game.spawns[data[myRoomName].spawns[0]].createCreep(data[myRoomName].defenderHi, 'defender' + id);
             } else {
-                Game.spawns['Spawn1'].createCreep(defenderLo, 'defender' + id);
+                Game.spawns[data[myRoomName].spawns[0]].createCreep(data[myRoomName].defenderLo, 'defender' + id);
             }
             let username = hostiles[0].owner.username;
             Game.notify(`User ${username} spotted in room ${myRoomName}`);
