@@ -1,10 +1,13 @@
-let farmer = [MOVE, WORK, WORK, WORK, WORK, WORK]
+let farmer = [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE]
 
-let carrier = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
+let carrier = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
 
-let builder = [MOVE, MOVE, CARRY, CARRY, CARRY, WORK, WORK, WORK]
+let builder = [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK]
 
-let upgrader = [MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK]
+let upgrader = [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK]
+
+let defenderHi = [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH]
+let defenderLo = [MOVE, ATTACK, ATTACK, ATTACK, TOUGH]
 
 let wall = 10000
 
@@ -45,6 +48,13 @@ function jobs() {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
                         }
+                    } else {
+                        let ruin = creep.pos.findClosestByPath(FIND_RUINS, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 0 } })
+                        if (ruin) {
+                            if (creep.withdraw(ruin, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(ruin)
+                            }
+                        }
                     }
 
                 } else {
@@ -59,8 +69,8 @@ function jobs() {
                                 creep.moveTo(exTarget)
                             }
                         } else {
-                            let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter:  (s) => { return(s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 )} });
-                            
+                            let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } });
+
                             if (towers) {
                                 if (creep.transfer(towers, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                     creep.moveTo(towers)
@@ -131,10 +141,7 @@ function jobs() {
                                         filter: (s) => (s.structureType == STRUCTURE_WALL && s.hits < wall)
 
                                     });
-                                let repairContainer = creep.pos.findClosestByPath(FIND_STRUCTURES,
-                                    {
-                                        filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.hits < 100000)
-                                    });
+                                let closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
                                 if (repairRoad) {
                                     if (creep.repair(repairRoad) == ERR_NOT_IN_RANGE) {
                                         creep.moveTo(repairRoad)
@@ -143,9 +150,9 @@ function jobs() {
                                     if (creep.repair(repairWall) == ERR_NOT_IN_RANGE) {
                                         creep.moveTo(repairWall)
                                     }
-                                } else if (repairContainer) {
-                                    if (creep.repair(repairContainer) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(repairContainer)
+                                } else if (closestDamagedStructure) {
+                                    if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
+                                        creep.moveTo(closestDamagedStructure)
                                     }
                                 }
                             } else {
@@ -224,6 +231,16 @@ function jobs() {
                 }
                 upgradersCount++
             }
+        } else if (creepname.includes('defender')) {
+            let creep = Game.creeps[creepname]
+            if (creep) {
+                let target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS)
+                if (target) {
+                    if (creep.attack(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    }
+                }
+            }
         }
     }
     let id = Math.floor(1000 + Math.random() * 9000);
@@ -246,6 +263,12 @@ function defendRoom(myRoomName) {
         //if there are hostiles - attakc them    
         if (hostiles.length > 0) {
             Game.rooms[myRoomName].controller.activateSafeMode();
+            let id = Math.floor(1000 + Math.random() * 9000);
+            if (Game.spawns['Spawn1'].canCreateCreep(defenderHi, 'defender' + id) == OK) {
+                Game.spawns['Spawn1'].createCreep(defenderHi, 'defender' + id);
+            } else {
+                Game.spawns['Spawn1'].createCreep(defenderLo, 'defender' + id);
+            }
             let username = hostiles[0].owner.username;
             Game.notify(`User ${username} spotted in room ${myRoomName}`);
             towers.forEach(tower => tower.attack(hostiles[0]));
@@ -266,10 +289,10 @@ function defendRoom(myRoomName) {
             for (let i in towers) {
                 //...repair Buildings! :) But ONLY until HALF the energy of the tower is gone.
                 //Because we don't want to be exposed if something shows up at our door :
-                if (towers[i].store[RESOURCE_ENERGY]> towers[i].store.getCapacity(RESOURCE_ENERGY) / 2) { 
+                if (towers[i].store[RESOURCE_ENERGY] > towers[i].store.getCapacity(RESOURCE_ENERGY) / 2) {
 
                     //Find the closest damaged Structure
-                    let closestDamagedStructure = towers[i].pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) =>{ return(s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) }})
+                    let closestDamagedStructure = towers[i].pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
                     if (closestDamagedStructure) {
                         towers[i].repair(closestDamagedStructure);
                     }
