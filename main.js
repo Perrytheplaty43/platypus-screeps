@@ -1,10 +1,10 @@
 const data = {
     "W51S37": {
-        farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK],
-        upgrader: [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK],
-        defenderHi: [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+        farmer: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
         wall: 20000,
         spawns: ['Spawn1']
@@ -44,9 +44,16 @@ function jobs(roomName) {
                     let target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
                         filter: (r) => r.resourceType == RESOURCE_ENERGY && r.amount > 50
                     });
+                    let targetStorage = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
+                    })
                     if (target) {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
+                        }
+                    } else if (targetStorage) {
+                        if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(targetStorage);
                         }
                     } else {
                         let ruin = creep.pos.findClosestByPath(FIND_RUINS, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 0 } })
@@ -86,7 +93,7 @@ function jobs(roomName) {
                                 let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
                                     {
                                         filter: (s) => {
-                                            return (s.structureType == STRUCTURE_CONTAINER)
+                                            return (s.structureType == STRUCTURE_STORAGE)
                                         }
                                     });
                                 if (conainterTarget) {
@@ -106,7 +113,7 @@ function jobs(roomName) {
                             let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
                                 {
                                     filter: (s) => {
-                                        return (s.structureType == STRUCTURE_CONTAINER)
+                                        return (s.structureType == STRUCTURE_STORAGE)
                                     }
                                 });
                             if (conainterTarget) {
@@ -148,7 +155,7 @@ function jobs(roomName) {
                                         filter: (s) => (s.structureType == STRUCTURE_WALL && s.hits < data[roomName].wall)
 
                                     });
-                                let closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
+                                let closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
                                 if (repairRoad) {
                                     if (creep.repair(repairRoad) == ERR_NOT_IN_RANGE) {
                                         creep.moveTo(repairRoad)
@@ -177,7 +184,7 @@ function jobs(roomName) {
                                 } else {
                                     let targetEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES,
                                         {
-                                            filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0)
+                                            filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
 
                                         });
                                     if (targetEnergy) {
@@ -190,7 +197,7 @@ function jobs(roomName) {
                         }
                     }
                 } else {
-                    if (creep.pos.getRangeTo(FIND_DROPPED_RESOURCES) < creep.pos.getRangeTo(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0) }) && FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0) } != null) {
+                    if (creep.pos.getRangeTo(FIND_DROPPED_RESOURCES) < creep.pos.getRangeTo(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0) }) && FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0) } != null) {
                         let targetEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                         if (targetEnergy) {
                             if (creep.pickup(targetEnergy) == ERR_NOT_IN_RANGE) {
@@ -200,7 +207,7 @@ function jobs(roomName) {
                     } else {
                         let targetEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES,
                             {
-                                filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0)
+                                filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
 
                             });
                         if (targetEnergy) {
@@ -227,9 +234,16 @@ function jobs(roomName) {
                             filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0)
 
                         });
+                    let targetStorage = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
+                    })
                     if (targetEnergy) {
                         if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(targetEnergy);
+                        }
+                    } else if (targetStorage) {
+                        if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(targetStorage);
                         }
                     } else {
                         let targetEnergy2 = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
@@ -255,7 +269,7 @@ function jobs(roomName) {
         }
     }
     let id = Math.floor(1000 + Math.random() * 9000);
-    if (farmersCount < 3) {
+    if (farmersCount < 2) {
         spawn.spawnCreep(data[roomName].farmer, 'farmer' + id)
     } else if (carriersCount < 2) {
         spawn.spawnCreep(data[roomName].carrier, 'carrier' + id)
