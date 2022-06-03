@@ -6,7 +6,7 @@ const data = {
         upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
-        wall: 20000,
+        wall: 40000,
         spawns: ['Spawn1']
     }
 }
@@ -17,6 +17,7 @@ module.exports.loop = function () {
     }
     jobs('W51S37')
     defendRoom('W51S37', 'Spawn1')
+    exportStats()
 }
 
 function jobs(roomName) {
@@ -51,7 +52,7 @@ function jobs(roomName) {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
                         }
-                    } else if (targetStorage) {
+                    } else if (targetStorage && spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && (FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) }) && (FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } })) {
                         if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(targetStorage);
                         }
@@ -273,9 +274,9 @@ function jobs(roomName) {
         spawn.spawnCreep(data[roomName].farmer, 'farmer' + id)
     } else if (carriersCount < 2) {
         spawn.spawnCreep(data[roomName].carrier, 'carrier' + id)
-    } else if (buildersCount < 3) {
+    } else if (buildersCount < 1) {
         spawn.spawnCreep(data[roomName].builder, 'builder' + id)
-    } else if (upgradersCount < 3) {
+    } else if (upgradersCount < 2) {
         spawn.spawnCreep(data[roomName].upgrader, 'upgrader' + id)
     }
 }
@@ -326,4 +327,41 @@ function defendRoom(myRoomName) {
 
         }
     }
+}
+
+function exportStats() {
+    // Reset stats object
+    Memory.stats = {
+        gcl: {},
+        rooms: {},
+        cpu: {},
+    };
+
+    Memory.stats.time = Game.time;
+
+    // Collect room stats
+    for (let roomName in Game.rooms) {
+        let room = Game.rooms[roomName];
+        let isMyRoom = (room.controller ? room.controller.my : false);
+        if (isMyRoom) {
+            let roomStats = Memory.stats.rooms[roomName] = {};
+            roomStats.storageEnergy = (room.storage ? room.storage.store.energy : 0);
+            roomStats.terminalEnergy = (room.terminal ? room.terminal.store.energy : 0);
+            roomStats.energyAvailable = room.energyAvailable;
+            roomStats.energyCapacityAvailable = room.energyCapacityAvailable;
+            roomStats.controllerProgress = room.controller.progress;
+            roomStats.controllerProgressTotal = room.controller.progressTotal;
+            roomStats.controllerLevel = room.controller.level;
+        }
+    }
+
+    // Collect GCL stats
+    Memory.stats.gcl.progress = Game.gcl.progress;
+    Memory.stats.gcl.progressTotal = Game.gcl.progressTotal;
+    Memory.stats.gcl.level = Game.gcl.level;
+
+    // Collect CPU stats
+    Memory.stats.cpu.bucket = Game.cpu.bucket;
+    Memory.stats.cpu.limit = Game.cpu.limit;
+    Memory.stats.cpu.used = Game.cpu.getUsed();
 }
