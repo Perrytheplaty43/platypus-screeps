@@ -7,9 +7,15 @@ const data = {
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
         wall: 50000,
-        spawns: ['Spawn1']
+        spawns: ['Spawn1'],
+        oldPoints: 0,
+        TTU: 0,
+        oldLevel: 4
     }
 }
+
+let tickCount = 0
+let avgTickCount = 12
 
 module.exports.loop = function () {
     if (Game.cpu.bucket == 10000) {
@@ -33,7 +39,7 @@ function jobs(roomName) {
                 let target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
                 if (target) {
                     if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target, {visualizePathStyle: {stroke: '#ffff00', opacity: 0.9}});
+                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
                     }
                 }
                 farmersCount++
@@ -50,23 +56,23 @@ function jobs(roomName) {
                     })
                     if (target) {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(target, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}});
+                            creep.moveTo(target, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else if (targetStorage && spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && (FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) }) && (FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } })) {
                         if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(targetStorage, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}});
+                            creep.moveTo(targetStorage, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else {
                         let ruin = creep.pos.findClosestByPath(FIND_RUINS, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 0 } })
                         if (ruin) {
                             if (creep.withdraw(ruin, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(ruin, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                creep.moveTo(ruin, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         } else {
                             let tomb = creep.pos.findClosestByPath(FIND_TOMBSTONES, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 100 } })
                             if (tomb) {
                                 if (creep.withdraw(tomb, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(tomb, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                    creep.moveTo(tomb, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             }
                         }
@@ -75,20 +81,20 @@ function jobs(roomName) {
                 } else {
                     if (spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
                         if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(spawn, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                            creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                         }
                     } else if (FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) }) {
                         let exTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) })
                         if (exTarget) {
                             if (creep.transfer(exTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(exTarget, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                creep.moveTo(exTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         } else {
                             let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } });
 
                             if (towers) {
                                 if (creep.transfer(towers, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(towers, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                    creep.moveTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             } else {
                                 let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
@@ -99,7 +105,7 @@ function jobs(roomName) {
                                     });
                                 if (conainterTarget) {
                                     if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(conainterTarget, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                        creep.moveTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                     }
                                 }
                             }
@@ -108,7 +114,7 @@ function jobs(roomName) {
                         let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
                         if (towers) {
                             if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(towers, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                creep.moveTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         } else {
                             let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
@@ -119,7 +125,7 @@ function jobs(roomName) {
                                 });
                             if (conainterTarget) {
                                 if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(conainterTarget, {visualizePathStyle: {stroke: '#ff1100', opacity: 0.9}})
+                                    creep.moveTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             }
                         }
@@ -137,13 +143,13 @@ function jobs(roomName) {
                         })
                     if (rampTarget) {
                         if (creep.repair(rampTarget) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(rampTarget, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}})
+                            creep.moveTo(rampTarget, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                         }
                     } else {
                         let target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                         if (target) {
                             if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(target, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}});
+                                creep.moveTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                             }
                         } else {
                             if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
@@ -159,19 +165,19 @@ function jobs(roomName) {
                                 let closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
                                 if (repairRoad) {
                                     if (creep.repair(repairRoad) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(repairRoad, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}})
+                                        creep.moveTo(repairRoad, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                                     }
                                 } else if (repairWall) {
                                     if (creep.repair(repairWall) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(repairWall, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}})
+                                        creep.moveTo(repairWall, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                                     }
                                 } else if (closestDamagedStructure) {
                                     if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(closestDamagedStructure, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}})
+                                        creep.moveTo(closestDamagedStructure, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                                     }
                                 } else if (creep.room.controller) {
                                     if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}});
+                                        creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                     }
                                 }
                             } else {
@@ -179,7 +185,7 @@ function jobs(roomName) {
                                     let targetEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                                     if (targetEnergy) {
                                         if (creep.pickup(targetEnergy) == ERR_NOT_IN_RANGE) {
-                                            creep.moveTo(targetEnergy, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}});
+                                            creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                         }
                                     }
                                 } else {
@@ -190,7 +196,7 @@ function jobs(roomName) {
                                         });
                                     if (targetEnergy) {
                                         if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                            creep.moveTo(targetEnergy, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}});
+                                            creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                         }
                                     }
                                 }
@@ -202,7 +208,7 @@ function jobs(roomName) {
                         let targetEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                         if (targetEnergy) {
                             if (creep.pickup(targetEnergy) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(targetEnergy, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}});
+                                creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                             }
                         }
                     } else {
@@ -213,7 +219,7 @@ function jobs(roomName) {
                             });
                         if (targetEnergy) {
                             if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(targetEnergy, {visualizePathStyle: {stroke: '#0055ff', opacity: 0.9}});
+                                creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                             }
                         }
                     }
@@ -226,7 +232,7 @@ function jobs(roomName) {
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                     if (creep.room.controller) {
                         if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#aa00ff', opacity: 0.9}});
+                            creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     }
                 } else {
@@ -240,17 +246,17 @@ function jobs(roomName) {
                     })
                     if (targetEnergy) {
                         if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(targetEnergy, {visualizePathStyle: {stroke: '#aa00ff', opacity: 0.9}});
+                            creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     } else if (targetStorage) {
                         if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(targetStorage, {visualizePathStyle: {stroke: '#aa00ff', opacity: 0.9}});
+                            creep.moveTo(targetStorage, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     } else {
                         let targetEnergy2 = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                         if (targetEnergy2) {
                             if (creep.pickup(targetEnergy2) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(targetEnergy2, {visualizePathStyle: {stroke: '#aa00ff', opacity: 0.9}});
+                                creep.moveTo(targetEnergy2, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                             }
                         }
                     }
@@ -263,7 +269,7 @@ function jobs(roomName) {
                 let target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS)
                 if (target) {
                     if (creep.attack(target) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target, {visualizePathStyle: {stroke: '#ff00ae', opacity: 0.9}});
+                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } });
                     }
                 }
             }
@@ -285,12 +291,55 @@ function jobs(roomName) {
 function visuals(roomName) {
     for (let i in data[roomName].spawns) {
         if (Game.spawns[data[roomName].spawns[i]].spawning) {
-            new RoomVisual(roomName).text("Spawning: " + Game.spawns[data[roomName].spawns[i]].spawning.name +
-                " Time Remaning: " + Game.spawns[data[roomName].spawns[i]].spawning.remainingTime, Game.spawns[data[roomName].spawns[i]].pos.x + 3, Game.spawns[data[roomName].spawns[i]].pos.y, {
+            new RoomVisual(roomName).text("Spawning: " + Game.spawns[data[roomName].spawns[i]].spawning.name, Game.spawns[data[roomName].spawns[i]].pos.x + 4, Game.spawns[data[roomName].spawns[i]].pos.y + 1, {
                 font: 0.4,
-                color: 'red'
+                align: 'right',
+                color: 'white',
+                backgroundColor: 'black',
+                backgroundPadding: 0.05
+            })
+            new RoomVisual(roomName).text("Time Remaning: " + Game.spawns[data[roomName].spawns[i]].spawning.remainingTime, Game.spawns[data[roomName].spawns[i]].pos.x + 4, Game.spawns[data[roomName].spawns[i]].pos.y + 1.5, {
+                font: 0.4,
+                align: 'right',
+                color: 'white',
+                backgroundColor: 'black',
+                backgroundPadding: 0.05
             })
         }
+    }
+    new RoomVisual(roomName).text(nFormatter(Game.rooms[roomName].controller.progress, 1) + "/" + nFormatter(Game.rooms[roomName].controller.progressTotal, 1), Game.rooms[roomName].controller.pos.x + 3, Game.rooms[roomName].controller.pos.y, {
+        font: 0.4,
+        align: 'right',
+        color: 'white'
+    })
+    new RoomVisual(roomName).text(getTTU(roomName) + " Hrs Est.", Game.rooms[roomName].controller.pos.x + 3, Game.rooms[roomName].controller.pos.y + 0.5, {
+        font: 0.4,
+        align: 'right',
+        color: 'white'
+    })
+}
+
+function getTTU(roomName) {
+    if (tickCount >= 12) {
+        let old
+        if (data[roomName].oldLevel == Game.rooms[roomName].controller.level) old = data[roomName].oldPoints
+        else { 
+            old = 0
+            data[roomName].oldLevel = Game.rooms[roomName].controller.level
+        }
+        let diff = Game.rooms[roomName].controller.progress - old
+        let avgPerTick = diff / avgTickCount
+        let ticksLeft = (Game.rooms[roomName].controller.progressTotal - Game.rooms[roomName].controller.progress) / avgPerTick
+        let secLeft = ticksLeft * 5.06
+        data[roomName].TTU = Math.round(secLeft / 60 / 60)
+        tickCount = 0
+        if (tickCount == 0) {
+            data[roomName].oldPoints = Game.rooms[roomName].controller.progress
+        } else avgTickCount += 12
+        return Math.round(secLeft / 60 / 60 * 10) / 10
+    } else {
+        tickCount++
+        return data[roomName].TTU
     }
 }
 
@@ -342,40 +391,19 @@ function defendRoom(myRoomName) {
     }
 }
 
-function exportStats() {
-    // Reset stats object
-    Memory.stats = {
-        gcl: {},
-        rooms: {},
-        cpu: {},
-    };
-
-    Memory.stats.time = Game.time;
-
-    // Collect room stats
-    for (let roomName in Game.rooms) {
-        let room = Game.rooms[roomName];
-        let isMyRoom = (room.controller ? room.controller.my : false);
-        if (isMyRoom) {
-            Memory.stats["room." + room.name + ".energyAvailable"] = room.energyAvailable;
-            let roomStats = Memory.stats.rooms[roomName] = {};
-            roomStats.storageEnergy = (room.storage ? room.storage.store.energy : 0);
-            roomStats.terminalEnergy = (room.terminal ? room.terminal.store.energy : 0);
-            roomStats.energyAvailable = room.energyAvailable;
-            roomStats.energyCapacityAvailable = room.energyCapacityAvailable;
-            roomStats.controllerProgress = room.controller.progress;
-            roomStats.controllerProgressTotal = room.controller.progressTotal;
-            roomStats.controllerLevel = room.controller.level;
-        }
-    }
-
-    // Collect GCL stats
-    Memory.stats.gcl.progress = Game.gcl.progress;
-    Memory.stats.gcl.progressTotal = Game.gcl.progressTotal;
-    Memory.stats.gcl.level = Game.gcl.level;
-
-    // Collect CPU stats
-    Memory.stats.cpu.bucket = Game.cpu.bucket;
-    Memory.stats.cpu.limit = Game.cpu.limit;
-    Memory.stats.cpu.used = Game.cpu.getUsed();
+function nFormatter(num, digits) {
+    const lookup = [
+        { value: 1, symbol: "" },
+        { value: 1e3, symbol: "k" },
+        { value: 1e6, symbol: "M" },
+        { value: 1e9, symbol: "G" },
+        { value: 1e12, symbol: "T" },
+        { value: 1e15, symbol: "P" },
+        { value: 1e18, symbol: "E" }
+    ];
+    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+    var item = lookup.slice().reverse().find(function (item) {
+        return num >= item.value;
+    });
+    return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
 }
