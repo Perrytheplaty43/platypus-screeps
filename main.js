@@ -6,7 +6,7 @@ const data = {
         upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
-        wall: 40000,
+        wall: 50000,
         spawns: ['Spawn1']
     }
 }
@@ -17,7 +17,7 @@ module.exports.loop = function () {
     }
     jobs('W51S37')
     defendRoom('W51S37', 'Spawn1')
-    exportStats()
+    //exportStats()
 }
 
 function jobs(roomName) {
@@ -344,6 +344,7 @@ function exportStats() {
         let room = Game.rooms[roomName];
         let isMyRoom = (room.controller ? room.controller.my : false);
         if (isMyRoom) {
+            Memory.stats["room." + room.name + ".energyAvailable"] = room.energyAvailable;
             let roomStats = Memory.stats.rooms[roomName] = {};
             roomStats.storageEnergy = (room.storage ? room.storage.store.energy : 0);
             roomStats.terminalEnergy = (room.terminal ? room.terminal.store.energy : 0);
