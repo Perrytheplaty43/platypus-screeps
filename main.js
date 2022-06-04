@@ -331,7 +331,7 @@ function getTTU(roomName) {
         let avgPerTick = diff / avgTickCount
         let ticksLeft = (Game.rooms[roomName].controller.progressTotal - Game.rooms[roomName].controller.progress) / avgPerTick
         let secLeft = ticksLeft * 5.06
-        data[roomName].TTU = Math.round(secLeft / 60 / 60)
+        data[roomName].TTU = Math.round(secLeft / 60 / 60 * 10) / 10
         tickCount = 0
         if (tickCount == 0) {
             data[roomName].oldPoints = Game.rooms[roomName].controller.progress
