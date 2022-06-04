@@ -10,7 +10,13 @@ const data = {
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
-        oldLevel: 4
+        oldLevel: 4,
+        population: {
+            farmer: 2,
+            carrier: 2,
+            builder: 3,
+            upgrader: 2
+        }
     }
 }
 
@@ -276,13 +282,13 @@ function jobs(roomName) {
         }
     }
     let id = Math.floor(1000 + Math.random() * 9000);
-    if (farmersCount < 2) {
+    if (farmersCount < data[roomName].population.farmer) {
         spawn.spawnCreep(data[roomName].farmer, 'farmer' + id)
-    } else if (carriersCount < 2) {
+    } else if (carriersCount < data[roomName].population.carrier) {
         spawn.spawnCreep(data[roomName].carrier, 'carrier' + id)
-    } else if (buildersCount < 1) {
+    } else if (buildersCount < data[roomName].population.builder) {
         spawn.spawnCreep(data[roomName].builder, 'builder' + id)
-    } else if (upgradersCount < 2) {
+    } else if (upgradersCount < data[roomName].population.upgrader) {
         spawn.spawnCreep(data[roomName].upgrader, 'upgrader' + id)
     }
     visuals(roomName)
