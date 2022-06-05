@@ -1,21 +1,35 @@
 const data = {
     "W51S37": {
-        farmer: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+        farmer: [CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+            WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+            WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+            ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
-        wall: 50000,
+        wall: 60000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
-        oldLevel: 4,
+        oldLevel: 5,
         population: {
             farmer: 2,
             carrier: 2,
-            builder: 3,
+            builder: 1,
             upgrader: 2
+        },
+        linkFrom: {
+            x: 28,
+            y: 26
+        },
+        linkTo: {
+            x: 15,
+            y: 36
         }
     }
 }
@@ -29,7 +43,7 @@ module.exports.loop = function () {
     }
     jobs('W51S37')
     defendRoom('W51S37', 'Spawn1')
-    //exportStats()
+    link('W51S37')
 }
 
 function jobs(roomName) {
@@ -38,31 +52,84 @@ function jobs(roomName) {
     let buildersCount = 0;
     let upgradersCount = 0;
     let spawn = Game.spawns[data[roomName].spawns[0]];
+    let sources = Game.rooms[roomName].find(FIND_SOURCES);
+    for (s in sources) {
+        let checkCreep = Memory[sources[s].id + "s:c"]
+        if (!Game.getObjectById(checkCreep)) {
+            Memory[sources[s].id + "s:c"] = ""
+        }
+    }
     for (let creepname in Game.creeps) {
         if (creepname.includes('farmer')) {
             let creep = Game.creeps[creepname]
             if (creep) {
-                let target = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-                if (target) {
-                    if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
+                let source;
+                if (creep.memory.sourceId) {
+                    source = Game.getObjectById(creep.memory.sourceId);
+                } else {
+                    for (source = sources.pop(); source && Memory[source.id + "s:c"]; source = sources.pop()) { }
+                    if (source) {
+                        creep.memory.sourceId = source.id;
+                        Memory[source.id + "s:c"] = creep.id;
                     }
                 }
+                if (!source) {
+                    continue;
+                }
+
+                if (creep.store.getFreeCapacity() > (() => {
+                    let count = 0
+                    data[roomName].farmer.forEach(element => {
+                        if (element == WORK) {
+                            count += 2
+                        }
+                    })
+                    return count
+                })()) {
+                    if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(source, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
+                    }
+                } else {
+                    let targetLink = Game.rooms[roomName].lookForAt('structure', data[roomName].linkFrom.x, data[roomName].linkFrom.y)[0];
+                    let containerTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER) })
+                    if (creep.transfer(targetLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        if (containerTarget) {
+                            if (creep.transfer(containerTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.drop(RESOURCE_ENERGY);
+                            }
+                        } else {
+                            creep.drop(RESOURCE_ENERGY);
+                        }
+                    }
+                }
+
                 farmersCount++
             }
         } else if (creepname.includes('carrier')) {
             let creep = Game.creeps[creepname]
             if (creep) {
                 if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) {
+                    let target1 = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[1];
                     let target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
                         filter: (r) => r.resourceType == RESOURCE_ENERGY && r.amount > 50
                     });
                     let targetStorage = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
                     })
-                    if (target) {
+                    let containerTarget1 = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 100) })
+                    if (target1 && target1.store[RESOURCE_ENERGY] > 0) {
+                        if (target1.store[RESOURCE_ENERGY] > 0) {
+                            if (creep.withdraw(target1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(target1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                            }
+                        }
+                    } else if (target) {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(target, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                        }
+                    } else if (containerTarget1) {
+                        if (creep.withdraw(containerTarget1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(containerTarget1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else if (targetStorage && spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && (FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) }) && (FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } })) {
                         if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -211,10 +278,23 @@ function jobs(roomName) {
                     }
                 } else {
                     if (creep.pos.getRangeTo(FIND_DROPPED_RESOURCES) < creep.pos.getRangeTo(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0) }) && FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0) } != null) {
-                        let targetEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+                        let targetEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+                            filter: (r) => r.resourceType == RESOURCE_ENERGY && r.amount > 300
+                        });
                         if (targetEnergy) {
                             if (creep.pickup(targetEnergy) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                            }
+                        } else {
+                            let targetEnergyS = creep.pos.findClosestByPath(FIND_STRUCTURES,
+                                {
+                                    filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
+
+                                });
+                            if (targetEnergyS) {
+                                if (creep.withdraw(targetEnergyS, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(targetEnergyS, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                }
                             }
                         }
                     } else {
@@ -313,23 +393,28 @@ function visuals(roomName) {
             })
         }
     }
-    new RoomVisual(roomName).text(nFormatter(Game.rooms[roomName].controller.progress, 1) + "/" + nFormatter(Game.rooms[roomName].controller.progressTotal, 1), Game.rooms[roomName].controller.pos.x + 3, Game.rooms[roomName].controller.pos.y, {
+    new RoomVisual(roomName).text(nFormatter(Game.rooms[roomName].controller.progress, 1) + "/" + nFormatter(Game.rooms[roomName].controller.progressTotal, 1), Game.rooms[roomName].controller.pos.x + 1, Game.rooms[roomName].controller.pos.y, {
         font: 0.4,
-        align: 'right',
+        align: 'left',
         color: 'white'
     })
-    new RoomVisual(roomName).text(getTTU(roomName) + " Hrs Est.", Game.rooms[roomName].controller.pos.x + 3, Game.rooms[roomName].controller.pos.y + 0.5, {
+    new RoomVisual(roomName).text(getTTU(roomName, false), Game.rooms[roomName].controller.pos.x + 1, Game.rooms[roomName].controller.pos.y + 0.5, {
         font: 0.4,
-        align: 'right',
+        align: 'left',
+        color: 'white'
+    })
+    new RoomVisual(roomName).text(addHours(data[roomName].TTU), Game.rooms[roomName].controller.pos.x + 1, Game.rooms[roomName].controller.pos.y + 1, {
+        font: 0.4,
+        align: 'left',
         color: 'white'
     })
 }
 
-function getTTU(roomName) {
+function getTTU(roomName, raw) {
     if (tickCount >= 12) {
         let old
         if (data[roomName].oldLevel == Game.rooms[roomName].controller.level) old = data[roomName].oldPoints
-        else { 
+        else {
             old = 0
             data[roomName].oldLevel = Game.rooms[roomName].controller.level
         }
@@ -337,15 +422,17 @@ function getTTU(roomName) {
         let avgPerTick = diff / avgTickCount
         let ticksLeft = (Game.rooms[roomName].controller.progressTotal - Game.rooms[roomName].controller.progress) / avgPerTick
         let secLeft = ticksLeft * 5.06
-        data[roomName].TTU = Math.round(secLeft / 60 / 60 * 10) / 10
+        data[roomName].TTU = secLeft / 60 / 60
         tickCount = 0
         if (tickCount == 0) {
             data[roomName].oldPoints = Game.rooms[roomName].controller.progress
         } else avgTickCount += 12
-        return Math.round(secLeft / 60 / 60 * 10) / 10
+        if (!raw) return Math.round(secLeft / 60 / 60 * 10) / 10 + " Hrs Est."
+        else return secLeft / 60 / 60
     } else {
         tickCount++
-        return data[roomName].TTU
+        if (!raw) return Math.round(data[roomName].TTU * 10) / 10 + " Hrs Est."
+        else data[roomName].TTU
     }
 }
 
@@ -397,6 +484,16 @@ function defendRoom(myRoomName) {
     }
 }
 
+function link(roomName) {
+    const linkFrom = Game.rooms[roomName].lookForAt('structure', data[roomName].linkFrom.x, data[roomName].linkFrom.y)[0];
+
+    const linkTo = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[1];
+
+    if (linkFrom.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+        linkFrom.transferEnergy(linkTo);
+    }
+}
+
 function nFormatter(num, digits) {
     const lookup = [
         { value: 1, symbol: "" },
@@ -412,4 +509,11 @@ function nFormatter(num, digits) {
         return num >= item.value;
     });
     return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+}
+
+function addHours(numOfHours) {
+    date = new Date()
+    date.setTime(date.getTime() + numOfHours * 60 * 60 * 1000);
+
+    return date.toLocaleString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: "America/Los_Angeles", hour: '2-digit', minute: '2-digit' });
 }
