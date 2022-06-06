@@ -19,7 +19,7 @@ const data = {
             CARRY, CARRY, CARRY, CARRY,
             WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
         tester: [MOVE],
-        wall: 80000,
+        wall: 90000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -44,10 +44,10 @@ const data = {
     },
     "W49S41": {
         worker: [MOVE, CARRY, WORK, WORK],
-        farmer: [WORK, WORK, MOVE, CARRY],
-        carrier: [MOVE, MOVE, MOVE, CARRY, CARRY, CARRY],
-        builder: [MOVE, CARRY, WORK, WORK],
-        upgrader: [MOVE, CARRY, WORK, WORK],
+        farmer: [WORK, WORK, WORK, WORK, MOVE, MOVE, CARRY],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK, WORK],
+        upgrader: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK, WORK],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
             ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
@@ -64,11 +64,11 @@ const data = {
         TTU: 0,
         oldLevel: 1,
         population: {
-            worker: 1,
+            worker: 0,
             farmer: 2,
             carrier: 2,
-            builder: 1,
-            upgrader: 2,
+            builder: 3,
+            upgrader: 3,
             claimer: 0,
             remoteBuilder: 0
         },
@@ -133,7 +133,6 @@ function jobs(roomName) {
                 }
 
                 if (creep.store.getFreeCapacity()) {
-                    console.log(creep.harvest(source), roomName)
                     if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
                     }
@@ -577,7 +576,7 @@ function getTTU(roomName, raw) {
         let diff = Game.rooms[roomName].controller.progress - old
         let avgPerTick = diff / avgTickCount
         let ticksLeft = (Game.rooms[roomName].controller.progressTotal - Game.rooms[roomName].controller.progress) / avgPerTick
-        let secLeft = ticksLeft * 5.06
+        let secLeft = ticksLeft * 5.11
         data[roomName].TTU = secLeft / 60 / 60
         tickCount = 0
         if (tickCount == 0) {
@@ -599,7 +598,12 @@ function defendRoom(myRoomName) {
     if (towers) {
         //if there are hostiles - attakc them    
         if (hostiles.length > 0) {
-            Game.rooms[myRoomName].controller.activateSafeMode();
+            let walls = Game.rooms[myRoomName].find(FIND_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART });
+            for (let wall of walls) {
+                if (wall.hits <= 5) {
+                    Game.rooms[myRoomName].controller.activateSafeMode();
+                }
+            }
             let id = Math.floor(1000 + Math.random() * 9000);
             if (Game.spawns[data[myRoomName].spawns[0]].canCreateCreep(data[myRoomName].defenderHi, 'defender' + id) == OK) {
                 Game.spawns[data[myRoomName].spawns[0]].createCreep(data[myRoomName].defenderHi, 'defender' + id);
