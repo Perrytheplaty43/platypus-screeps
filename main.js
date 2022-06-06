@@ -31,7 +31,7 @@ const data = {
             upgrader: 1,
             claimer: 0,
             worker: 0,
-            remoteBuilder: 4
+            remoteBuilder: 0
         },
         linkFrom: {
             x: 28,
@@ -43,7 +43,8 @@ const data = {
         }
     },
     "W49S41": {
-        farmer: [WORK, WORK, MOVE, MOVE],
+        worker: [MOVE, CARRY, WORK, WORK],
+        farmer: [WORK, WORK, MOVE, CARRY],
         carrier: [MOVE, MOVE, MOVE, CARRY, CARRY, CARRY],
         builder: [MOVE, CARRY, WORK, WORK],
         upgrader: [MOVE, CARRY, WORK, WORK],
@@ -92,6 +93,9 @@ module.exports.loop = function () {
     jobs('W51S37')
     defendRoom('W51S37', 'Spawn1')
     link('W51S37')
+
+    jobs('W49S41')
+    defendRoom('W49S41', 'Spawn2')
 }
 
 function jobs(roomName) {
@@ -111,7 +115,7 @@ function jobs(roomName) {
         }
     }
     for (let creepname in Game.creeps) {
-        if (creepname.includes('farmer')) {
+        if (creepname.includes('farmer') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             let creep = Game.creeps[creepname]
             if (creep) {
                 let source;
@@ -128,22 +132,25 @@ function jobs(roomName) {
                     continue;
                 }
 
-                if (creep.store.getFreeCapacity() > (() => {
-                    let count = 0
-                    data[roomName].farmer.forEach(element => {
-                        if (element == WORK) {
-                            count += 2
-                        }
-                    })
-                    return count
-                })()) {
+                if (creep.store.getFreeCapacity()) {
+                    console.log(creep.harvest(source), roomName)
                     if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
                     }
                 } else {
                     let targetLink = Game.rooms[roomName].lookForAt('structure', data[roomName].linkFrom.x, data[roomName].linkFrom.y)[0];
                     let containerTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER) })
-                    if (creep.transfer(targetLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    if (targetLink) {
+                        if (creep.transfer(targetLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            if (containerTarget) {
+                                if (creep.transfer(containerTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.drop(RESOURCE_ENERGY);
+                                }
+                            } else {
+                                creep.drop(RESOURCE_ENERGY);
+                            }
+                        }
+                    } else {
                         if (containerTarget) {
                             if (creep.transfer(containerTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                 creep.drop(RESOURCE_ENERGY);
@@ -156,7 +163,7 @@ function jobs(roomName) {
 
                 farmersCount++
             }
-        } else if (creepname.includes('carrier')) {
+        } else if (creepname.includes('carrier') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             let creep = Game.creeps[creepname]
             if (creep) {
                 if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) {
@@ -257,7 +264,7 @@ function jobs(roomName) {
                 }
                 carriersCount++
             }
-        } else if (creepname.includes('builder')) {
+        } else if (creepname.includes('builder') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             let creep = Game.creeps[creepname]
             if (creep) {
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
@@ -363,7 +370,7 @@ function jobs(roomName) {
                 }
                 buildersCount++
             }
-        } else if (creepname.includes('upgrader')) {
+        } else if (creepname.includes('upgrader') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             let creep = Game.creeps[creepname]
             if (creep) {
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
@@ -400,16 +407,17 @@ function jobs(roomName) {
                 }
                 upgradersCount++
             }
-        } else if (creepname.includes('defender')) {
+        } else if (creepname.includes('defender') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             let creep = Game.creeps[creepname]
             if (creep) {
+                let target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
                 if (target) {
                     if (creep.attack(target) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } });
                     }
                 }
             }
-        } else if (creepname.includes('claimer')) {
+        } else if (creepname.includes('claimer') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             creep = Game.creeps[creepname]
             if (creep) {
                 if (Game.flags.claim) {
@@ -423,16 +431,18 @@ function jobs(roomName) {
                 }
                 claimerCount++
             }
-        } else if (creepname.includes('remote-b')) {
+        } else if (creepname.includes('remote-b') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             creep = Game.creeps[creepname]
             if (creep) {
                 if (Game.flags.claim) {
                     if (creep.room != Game.flags.claim.room) {
                         creep.moveTo(Game.flags.claim, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                     } else {
-                        if (creep.store.getFreeCapacity() == 0) creep.memory.working = true
-                        else creep.memory.harvesting = true
-
+                        if (creep.store.getFreeCapacity() == 0) {
+                            creep.memory.working = true
+                        } else {
+                            creep.memory.harvesting = true
+                        }
                         if (creep.store.getUsedCapacity() == 0) {
                             creep.memory.harvest = true
                             creep.memory.working = false
@@ -442,6 +452,10 @@ function jobs(roomName) {
                             if (target) {
                                 if (creep.build(target) == ERR_NOT_IN_RANGE) {
                                     creep.moveTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                }
+                            } else if (spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+                                if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             } else {
                                 if (creep.room.controller) {
@@ -462,16 +476,19 @@ function jobs(roomName) {
                 }
                 remoteBuilderCount++
             }
-        } else if (creepname.includes('worker')) {
+        } else if (creepname.includes('worker') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             creep = Game.creeps[creepname]
             if (creep) {
-                if (creep.store.getFreeCapacity() == 0) creep.memory.working = true
-                else creep.memory.harvesting = true
-
+                if (creep.store.getFreeCapacity() == 0) {
+                    creep.memory.working = true
+                } else {
+                    creep.memory.harvesting = true
+                }
                 if (creep.store.getUsedCapacity() == 0) {
                     creep.memory.harvest = true
                     creep.memory.working = false
                 }
+
                 if (creep.memory.working) {
                     if (spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
                         if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
