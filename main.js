@@ -1,12 +1,12 @@
-var Traveler = require('Traveler');
+let Traveler = require('Traveler');
 
 const data = {
     "E46N42": {
-        worker: [MOVE, CARRY, WORK, WORK],
-        farmer: [MOVE, CARRY, WORK, WORK],
-        carrier: [MOVE, CARRY, CARRY, CARRY, MOVE, MOVE],
-        builder: [MOVE, CARRY, WORK, WORK],
-        upgrader: [MOVE, CARRY, WORK, WORK],
+        worker: [MOVE, MOVE, CARRY, CARRY, WORK, WORK],
+        farmer: [MOVE, MOVE, CARRY, WORK, WORK, WORK, WORK],
+        carrier: [CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+        builder: [MOVE, MOVE, CARRY, CARRY, WORK, WORK],
+        upgrader: [MOVE, MOVE, CARRY, CARRY, WORK, WORK],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
             ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
@@ -27,7 +27,7 @@ const data = {
             farmer: 2,
             carrier: 2,
             builder: 3,
-            upgrader: 0,
+            upgrader: 1,
             claimer: 0,
             remoteBuilder: 0
         },
@@ -50,7 +50,7 @@ module.exports.loop = function () {
         Game.cpu.generatePixel();
     }
     jobs('E46N42')
-    //defendRoom('W51S37', 'Spawn1')
+    defendRoom('E46N42', 'Spawn1')
     //link('W51S37')
 }
 
@@ -129,7 +129,7 @@ function jobs(roomName) {
                     let targetStorage = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (s) => (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
                     })
-                    let containerTarget1 = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 100) })
+                    let containerTarget1 = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 50) })
                     if (target1 && target1.store[RESOURCE_ENERGY] > 0) {
                         if (target1.store[RESOURCE_ENERGY] > 0) {
                             if (creep.withdraw(target1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
