@@ -15,13 +15,13 @@ const data = {
             CARRY, CARRY, CARRY, CARRY,
             WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-            CARRY, CARRY, CARRY, CARRY,
-            WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+            WORK, WORK, WORK, WORK, WORK,
+            CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
-        wall: 20000,
+        wall: 40000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -33,10 +33,10 @@ const data = {
             builder: 2,
             upgrader: 1,
             claimer: 0,
-            remoteBuilder: 0,
+            remoteBuilder: 1,
             reserver: 1,
             hauler: 1,
-            prospector: 0
+            prospector: 1
         },
         linkFrom: {
             x: 28,
@@ -88,6 +88,7 @@ function jobs(roomName) {
             let checkCreep = Game.flags[f].memory.creep
             let checkHauler = Game.flags[f].memory.creepHauler
             let checkProspector = Game.flags[f].memory.creepProspector
+            let checkRemoteBuilder = Game.flags[f].memory.creepBuilder
             if (!Game.getObjectById(checkCreep)) {
                 delete Game.flags[f].memory.creep
             }
@@ -96,6 +97,9 @@ function jobs(roomName) {
             }
             if (!Game.getObjectById(checkProspector)) {
                 delete Game.flags[f].memory.creepProspector
+            }
+            if (!Game.getObjectById(checkRemoteBuilder)) {
+                delete Game.flags[f].memory.creepBuilder
             }
         }
     }
@@ -424,46 +428,61 @@ function jobs(roomName) {
                 }
                 claimerCount++
             }
-        } else if (creepname.includes('remote-b') && Game.creeps[creepname].room == "[room " + roomName + "]") {
+        } else if (creepname.includes('remote-b') && (Game.creeps[creepname].room == "[room " + roomName + "]" || (() => { for (flag in data[roomName].remoteMining) { if (Game.creeps[creepname].room.name == data[roomName].remoteMining[flag]) { return true } } })())) {
             creep = Game.creeps[creepname]
             if (creep) {
-                if (Game.flags.claim) {
-                    if (creep.room != Game.flags.claim.room) {
-                        creep.travelTo(Game.flags.claim, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
-                    } else {
-                        if (creep.store.getFreeCapacity() == 0) {
-                            creep.memory.working = true
-                        } else {
-                            creep.memory.harvesting = true
-                        }
-                        if (creep.store.getUsedCapacity() == 0) {
-                            creep.memory.harvest = true
-                            creep.memory.working = false
-                        }
-                        if (creep.memory.working) {
-                            let target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                            if (target) {
-                                if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                let reserverFlags = []
+                for (flag in Game.flags) {
+                    if (Game.flags[flag].secondaryColor == COLOR_GREEN && !Game.flags[flag].memory.creepBuilder) {
+                        reserverFlags.push(flag)
+                    }
+                }
+                if (reserverFlags.length > 0) {
+                    let flag
+                    if (!creep.memory.reserveFlagId) {
+                        Game.flags[f].memory.creepBuilder = creep.id
+                        creep.memory.reserveFlagId = reserverFlags[0]
+                        flag = Game.flags[creep.memory.reserveFlagId]
+                    }
+                } else {
+                    flag = Game.flags[creep.memory.reserveFlagId]
+                    if (flag) {
+                        if (flag.room) {
+                            if (flag.room.name == creep.room.name) {
+                                if (creep.store.getFreeCapacity() == 0) {
+                                    creep.memory.working = true
+                                } else {
+                                    creep.memory.harvesting = true
                                 }
-                            } else if (spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-                                if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                if (creep.store.getUsedCapacity() == 0) {
+                                    creep.memory.harvest = true
+                                    creep.memory.working = false
                                 }
-                            } else {
-                                if (creep.room.controller) {
-                                    if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(creep.room.controller, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                                if (creep.memory.working) {
+                                    let target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                                    let closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
+                                    if (target) {
+                                        if (creep.build(target) == ERR_NOT_IN_RANGE) {
+                                            creep.travelTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                        }
+                                    } else if (closestDamagedStructure) {
+                                        if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
+                                            creep.travelTo(closestDamagedStructure, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                        }
+                                    }
+                                } else if (creep.memory.harvesting) {
+                                    const target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+                                    if (target) {
+                                        if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
+                                            creep.travelTo(target, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                                        }
                                     }
                                 }
+                            } else {
+                                creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
-                        } else if (creep.memory.harvesting) {
-                            const target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
-                            if (target) {
-                                if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(target, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
-                                }
-                            }
+                        } else {
+                            creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                         }
                     }
                 }
@@ -502,7 +521,8 @@ function jobs(roomName) {
                 }
                 workerCount++
             }
-        } else if (creepname.includes('reserver') && (Game.creeps[creepname].room == "[room " + roomName + "]" || (() => { for (flag in data[roomName].remoteMining) { if (Game.creeps[creepname].room.name == data[roomName].remoteMining[flag]) { return true } } })())) {            creep = Game.creeps[creepname]
+        } else if (creepname.includes('reserver') && (Game.creeps[creepname].room == "[room " + roomName + "]" || (() => { for (flag in data[roomName].remoteMining) { if (Game.creeps[creepname].room.name == data[roomName].remoteMining[flag]) { return true } } })())) {
+            creep = Game.creeps[creepname]
             if (creep) {
                 let reserverFlags = []
                 for (flag in Game.flags) {
@@ -642,7 +662,7 @@ function jobs(roomName) {
                                         creep.travelTo(remoteSource, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
                                     }
                                 } else {
-                                    let containerTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.getFreeCapacity > 0) })
+                                    let containerTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store.getFreeCapacity() > 0) })
                                     if (containerTarget) {
                                         if (creep.transfer(containerTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                             creep.drop(RESOURCE_ENERGY);
@@ -676,14 +696,14 @@ function jobs(roomName) {
         spawn.spawnCreep(data[roomName].upgrader, 'upgrader' + id)
     } else if (claimerCount < data[roomName].population.claimer) {
         spawn.spawnCreep(data[roomName].claimer, 'claimer' + id)
-    } else if (remoteBuilderCount < data[roomName].population.remoteBuilder) {
-        spawn.spawnCreep(data[roomName].remoteBuilder, 'remote-b' + id)
     } else if (reserverCount < data[roomName].population.reserver) {
         spawn.spawnCreep(data[roomName].reserver, 'reserver' + id)
     } else if (haulerCount < data[roomName].population.hauler) {
         spawn.spawnCreep(data[roomName].hauler, 'remote-h' + id)
     } else if (prospectorCount < data[roomName].population.prospector) {
         spawn.spawnCreep(data[roomName].prospector, 'remote-m' + id)
+    } else if (remoteBuilderCount < data[roomName].population.remoteBuilder) {
+        spawn.spawnCreep(data[roomName].remoteBuilder, 'remote-b' + id)
     }
     visuals(roomName)
 }
