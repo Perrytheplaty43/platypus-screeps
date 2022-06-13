@@ -21,7 +21,7 @@ const data = {
         hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
-        wall: 40000,
+        wall: 80000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -33,10 +33,10 @@ const data = {
             builder: 2,
             upgrader: 1,
             claimer: 0,
-            remoteBuilder: 1,
-            reserver: 1,
-            hauler: 1,
-            prospector: 1
+            remoteBuilder: 2,
+            reserver: 2,
+            hauler: 4,
+            prospector: 2
         },
         linkFrom: {
             x: 28,
@@ -47,7 +47,8 @@ const data = {
             y: 36
         },
         remoteMining: {
-            "Flag1": "E46N41"
+            "Flag1": "E46N41",
+            "Flag2": "E47N42"
         }
     }
 }
@@ -87,6 +88,7 @@ function jobs(roomName) {
         for (f in Game.flags) {
             let checkCreep = Game.flags[f].memory.creep
             let checkHauler = Game.flags[f].memory.creepHauler
+            let checkHauler2 = Game.flags[f].memory.creepHauler2
             let checkProspector = Game.flags[f].memory.creepProspector
             let checkRemoteBuilder = Game.flags[f].memory.creepBuilder
             if (!Game.getObjectById(checkCreep)) {
@@ -100,6 +102,9 @@ function jobs(roomName) {
             }
             if (!Game.getObjectById(checkRemoteBuilder)) {
                 delete Game.flags[f].memory.creepBuilder
+            }
+            if (!Game.getObjectById(checkHauler2)) {
+                delete Game.flags[f].memory.creepHauler2
             }
         }
     }
@@ -123,7 +128,7 @@ function jobs(roomName) {
 
                 if (creep.store.getFreeCapacity()) {
                     if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                        creep.travelTo(source, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
+                        creep.moveTo(source, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
                     }
                 } else {
                     let targetLink = Game.rooms[roomName].lookForAt('structure', data[roomName].linkFrom.x, data[roomName].linkFrom.y)[0];
@@ -166,32 +171,32 @@ function jobs(roomName) {
                     if (target1 && target1.store[RESOURCE_ENERGY] > 0) {
                         if (target1.store[RESOURCE_ENERGY] > 0) {
                             if (creep.withdraw(target1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(target1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                creep.moveTo(target1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         }
                     } else if (target) {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(target, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                            creep.moveTo(target, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else if (containerTarget1) {
                         if (creep.withdraw(containerTarget1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(containerTarget1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                            creep.moveTo(containerTarget1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else if (targetStorage && (FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) }) && (FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } })) {
                         if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(targetStorage, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                            creep.moveTo(targetStorage, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else {
                         let ruin = creep.pos.findClosestByPath(FIND_RUINS, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 0 } })
                         if (ruin) {
                             if (creep.withdraw(ruin, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(ruin, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                creep.moveTo(ruin, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         } else {
                             let tomb = creep.pos.findClosestByPath(FIND_TOMBSTONES, { filter: (s) => { return s.store[RESOURCE_ENERGY] > 100 } })
                             if (tomb) {
                                 if (creep.withdraw(tomb, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(tomb, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                    creep.moveTo(tomb, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             }
                         }
@@ -200,20 +205,20 @@ function jobs(roomName) {
                 } else {
                     if (spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
                         if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                            creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                         }
                     } else if (FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) }) {
                         let exTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTENSION && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) })
                         if (exTarget) {
                             if (creep.transfer(exTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(exTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                creep.moveTo(exTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         } else {
                             let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } });
 
                             if (towers) {
                                 if (creep.transfer(towers, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                    creep.moveTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             } else {
                                 let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
@@ -224,7 +229,7 @@ function jobs(roomName) {
                                     });
                                 if (conainterTarget) {
                                     if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                        creep.moveTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                     }
                                 }
                             }
@@ -233,7 +238,7 @@ function jobs(roomName) {
                         let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0 } });
                         if (towers) {
                             if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                creep.moveTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                             }
                         } else {
                             let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
@@ -244,7 +249,7 @@ function jobs(roomName) {
                                 });
                             if (conainterTarget) {
                                 if (creep.transfer(conainterTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                    creep.moveTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             }
                         }
@@ -262,13 +267,13 @@ function jobs(roomName) {
                         })
                     if (rampTarget) {
                         if (creep.repair(rampTarget) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(rampTarget, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
+                            creep.moveTo(rampTarget, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                         }
                     } else {
                         let target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                         if (target) {
                             if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                creep.moveTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                             }
                         } else {
                             if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
@@ -284,19 +289,19 @@ function jobs(roomName) {
                                 let closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
                                 if (repairRoad) {
                                     if (creep.repair(repairRoad) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(repairRoad, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
+                                        creep.moveTo(repairRoad, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                                     }
                                 } else if (repairWall) {
                                     if (creep.repair(repairWall) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(repairWall, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
+                                        creep.moveTo(repairWall, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                                     }
                                 } else if (closestDamagedStructure) {
                                     if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(closestDamagedStructure, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
+                                        creep.moveTo(closestDamagedStructure, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } })
                                     }
                                 } else if (creep.room.controller) {
                                     if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(creep.room.controller, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                        creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                     }
                                 }
                             } else {
@@ -304,7 +309,7 @@ function jobs(roomName) {
                                     let targetEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                                     if (targetEnergy) {
                                         if (creep.pickup(targetEnergy) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                            creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                         }
                                     }
                                 } else {
@@ -315,7 +320,7 @@ function jobs(roomName) {
                                         });
                                     if (targetEnergy) {
                                         if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                            creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                         }
                                     }
                                 }
@@ -334,11 +339,11 @@ function jobs(roomName) {
                             });
                         if (targetEnergy) {
                             if (creep.pickup(targetEnergy) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                             }
                         } else if (targetEnergyC) {
                             if (creep.withdraw(targetEnergyC, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(targetEnergyC, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                                creep.moveTo(targetEnergyC, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                             }
                         } else {
                             let targetEnergyS = creep.pos.findClosestByPath(FIND_STRUCTURES,
@@ -348,7 +353,7 @@ function jobs(roomName) {
                                 });
                             if (targetEnergyS) {
                                 if (creep.withdraw(targetEnergyS, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(targetEnergyS, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                    creep.moveTo(targetEnergyS, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                 }
                             }
                         }
@@ -360,7 +365,7 @@ function jobs(roomName) {
                             });
                         if (targetEnergy) {
                             if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                             }
                         }
                     }
@@ -373,7 +378,7 @@ function jobs(roomName) {
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                     if (creep.room.controller) {
                         if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(creep.room.controller, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                            creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     }
                 } else {
@@ -387,17 +392,17 @@ function jobs(roomName) {
                     })
                     if (targetEnergy) {
                         if (creep.withdraw(targetEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(targetEnergy, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                            creep.moveTo(targetEnergy, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     } else if (targetStorage) {
                         if (creep.withdraw(targetStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(targetStorage, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                            creep.moveTo(targetStorage, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     } else {
                         let targetEnergy2 = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                         if (targetEnergy2) {
                             if (creep.pickup(targetEnergy2) == ERR_NOT_IN_RANGE) {
-                                creep.travelTo(targetEnergy2, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                                creep.moveTo(targetEnergy2, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                             }
                         }
                     }
@@ -410,7 +415,7 @@ function jobs(roomName) {
                 let target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
                 if (target) {
                     if (creep.attack(target) == ERR_NOT_IN_RANGE) {
-                        creep.travelTo(target, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } });
+                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } });
                     }
                 }
             }
@@ -419,10 +424,10 @@ function jobs(roomName) {
             if (creep) {
                 if (Game.flags.claim) {
                     if (creep.room != Game.flags.claim.room) {
-                        creep.travelTo(Game.flags.claim, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                        creep.moveTo(Game.flags.claim, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                     } else {
                         if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(creep.room.controller, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                            creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     }
                 }
@@ -437,10 +442,10 @@ function jobs(roomName) {
                         reserverFlags.push(flag)
                     }
                 }
-                if (reserverFlags.length > 0) {
+                if (reserverFlags.length > 0 && !creep.memory.reserveFlagId) {
                     let flag
                     if (!creep.memory.reserveFlagId) {
-                        Game.flags[f].memory.creepBuilder = creep.id
+                        Game.flags[reserverFlags[0]].memory.creepBuilder = creep.id
                         creep.memory.reserveFlagId = reserverFlags[0]
                         flag = Game.flags[creep.memory.reserveFlagId]
                     }
@@ -463,26 +468,26 @@ function jobs(roomName) {
                                     let closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART) } })
                                     if (target) {
                                         if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(target, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                                            creep.moveTo(target, { maxRooms: 1, visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                                         }
                                     } else if (closestDamagedStructure) {
                                         if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(closestDamagedStructure, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                            creep.moveTo(closestDamagedStructure, { maxRooms: 1, visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                         }
                                     }
                                 } else if (creep.memory.harvesting) {
-                                    const target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+                                    let target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
                                     if (target) {
                                         if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(target, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                                            creep.moveTo(target, { maxRooms: 1, visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                                         }
                                     }
                                 }
                             } else {
-                                creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                                creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
                         } else {
-                            creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                            creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                         }
                     }
                 }
@@ -504,18 +509,18 @@ function jobs(roomName) {
                 if (creep.memory.working) {
                     if (spawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
                         if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                            creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                         }
                     } else if (creep.room.controller) {
                         if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(creep.room.controller, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
+                            creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#0055ff', opacity: 0.9 } });
                         }
                     }
                 } else if (creep.memory.harvesting) {
                     const target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
                     if (target) {
                         if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
-                            creep.travelTo(target, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
+                            creep.moveTo(target, { visualizePathStyle: { stroke: '#aa00ff', opacity: 0.9 } });
                         }
                     }
                 }
@@ -530,10 +535,10 @@ function jobs(roomName) {
                         reserverFlags.push(flag)
                     }
                 }
-                if (reserverFlags.length > 0) {
+                if (reserverFlags.length > 0 && !creep.memory.reserveFlagId) {
                     let flag
                     if (!creep.memory.reserveFlagId) {
-                        Game.flags[f].memory.creep = creep.id
+                        Game.flags[reserverFlags[0]].memory.creep = creep.id
                         creep.memory.reserveFlagId = reserverFlags[0]
                         flag = Game.flags[creep.memory.reserveFlagId]
                     }
@@ -543,13 +548,13 @@ function jobs(roomName) {
                         if (flag.room) {
                             if (flag.room.name == creep.room.name) {
                                 if (creep.reserveController(Game.rooms[data[roomName].remoteMining[flag.name]].controller) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(Game.rooms[data[roomName].remoteMining[flag.name]].controller, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                                    creep.moveTo(Game.rooms[data[roomName].remoteMining[flag.name]].controller, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                                 }
                             } else {
-                                creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                                creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
                         } else {
-                            creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                            creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                         }
                     }
                 }
@@ -560,14 +565,18 @@ function jobs(roomName) {
             if (creep) {
                 let reserverFlags = []
                 for (flag in Game.flags) {
-                    if (Game.flags[flag].secondaryColor == COLOR_GREEN && !Game.flags[flag].memory.creepHauler) {
+                    if (Game.flags[flag].secondaryColor == COLOR_GREEN && (!Game.flags[flag].memory.creepHauler || !Game.flags[flag].memory.creepHauler2)) {
                         reserverFlags.push(flag)
                     }
                 }
-                if (reserverFlags.length > 0) {
+                if (reserverFlags.length > 0 && !creep.memory.reserveFlagId) {
                     let flag
                     if (!creep.memory.reserveFlagId) {
-                        Game.flags[f].memory.creepHauler = creep.id
+                        if (!Game.flags[reserverFlags[0]].memory.creepHauler) {
+                            Game.flags[reserverFlags[0]].memory.creepHauler = creep.id
+                        } else if (!Game.flags[reserverFlags[0]].memory.creepHauler2) {
+                            Game.flags[reserverFlags[0]].memory.creepHauler2 = creep.id
+                        }
                         creep.memory.reserveFlagId = reserverFlags[0]
                         flag = Game.flags[creep.memory.reserveFlagId]
                     }
@@ -583,53 +592,51 @@ function jobs(roomName) {
                                     let containerTarget1 = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 50) })
                                     if (target) {
                                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(target, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                            creep.moveTo(target, { maxRooms: 1, visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         }
                                     } else if (containerTarget1) {
                                         if (creep.withdraw(containerTarget1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(containerTarget1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                            creep.moveTo(containerTarget1, { maxRooms: 1, visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         }
                                     }
                                 } else if (creep.store.getUsedCapacity() > 0) {
                                     let storageRoom = Game.rooms[roomName].find(FIND_STRUCTURES, {
                                         filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                                     })
-                                    console.log(storageRoom)
                                     if (storageRoom) {
                                         if (roomName != creep.room.name) {
-                                            let roomHome = new RoomPosition(0, 0, roomName)
+                                            let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
                                             creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         } else if (creep.transfer(storageRoom, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                            creep.travelTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                            creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         } else {
-                                            console.log("S")
-                                            creep.travelTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                            creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         }
                                     }
                                 }
                             } else if (creep.store.getUsedCapacity() > 0) {
-                                let storageRoom = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                let storageRoom = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
                                     filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                                 })
                                 if (storageRoom) {
                                     if (creep.transfer(storageRoom, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                        creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                     }
                                 }
                             } else {
-                                creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                                creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
                         } else if (creep.store.getUsedCapacity() > 0) {
-                            let storageRoom = Game.rooms[roomName].find(FIND_STRUCTURES, {
+                            let storageRoom = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
                                 filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                             })
                             if (storageRoom) {
                                 if (creep.transfer(storageRoom, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.travelTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                    creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                 }
                             }
                         } else {
-                            creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                            creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                         }
                     }
                 }
@@ -644,10 +651,10 @@ function jobs(roomName) {
                         reserverFlags.push(flag)
                     }
                 }
-                if (reserverFlags.length > 0) {
+                if (reserverFlags.length > 0 && !creep.memory.reserveFlagId) {
                     let flag
                     if (!creep.memory.reserveFlagId) {
-                        Game.flags[f].memory.creepProspector = creep.id
+                        Game.flags[reserverFlags[0]].memory.creepProspector = creep.id
                         creep.memory.reserveFlagId = reserverFlags[0]
                         flag = Game.flags[creep.memory.reserveFlagId]
                     }
@@ -659,7 +666,7 @@ function jobs(roomName) {
                                 let remoteSource = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE)
                                 if (creep.store.getFreeCapacity()) {
                                     if (creep.harvest(remoteSource) == ERR_NOT_IN_RANGE) {
-                                        creep.travelTo(remoteSource, { visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
+                                        creep.moveTo(remoteSource, { maxRooms: 1, visualizePathStyle: { stroke: '#ffff00', opacity: 0.9 } });
                                     }
                                 } else {
                                     let containerTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store.getFreeCapacity() > 0) })
@@ -672,10 +679,10 @@ function jobs(roomName) {
                                     }
                                 }
                             } else {
-                                creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                                creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
                         } else {
-                            creep.travelTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
+                            creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                         }
                     }
                 }
@@ -683,6 +690,7 @@ function jobs(roomName) {
             }
         }
     }
+    let list = []
     let id = Math.floor(1000 + Math.random() * 9000);
     if (workerCount < data[roomName].population.worker) {
         spawn.spawnCreep(data[roomName].worker, 'worker' + id)
@@ -705,10 +713,40 @@ function jobs(roomName) {
     } else if (remoteBuilderCount < data[roomName].population.remoteBuilder) {
         spawn.spawnCreep(data[roomName].remoteBuilder, 'remote-b' + id)
     }
-    visuals(roomName)
+    if (workerCount < data[roomName].population.worker) {
+        list.push("Worker")
+    }
+    if (farmersCount < data[roomName].population.farmer) {
+        list.push("Farmer")
+    }
+    if (carriersCount < data[roomName].population.carrier) {
+        list.push("Carrier")
+    }
+    if (buildersCount < data[roomName].population.builder) {
+        list.push("Builder")
+    }
+    if (upgradersCount < data[roomName].population.upgrader) {
+        list.push("Upgrader")
+    }
+    if (claimerCount < data[roomName].population.claimer) {
+        list.push("Claimer")
+    }
+    if (reserverCount < data[roomName].population.reserver) {
+        list.push("Reserver")
+    }
+    if (haulerCount < data[roomName].population.hauler) {
+        list.push("Hauler")
+    }
+    if (prospectorCount < data[roomName].population.prospector) {
+        list.push("Remote Miner")
+    }
+    if (remoteBuilderCount < data[roomName].population.remoteBuilder) {
+        list.push("Remote Builder")
+    }
+    visuals(roomName, list, spawn)
 }
 
-function visuals(roomName) {
+function visuals(roomName, list, spawn) {
     for (let i in data[roomName].spawns) {
         if (Game.spawns[data[roomName].spawns[i]].spawning) {
             new RoomVisual(roomName).text("Spawning: " + Game.spawns[data[roomName].spawns[i]].spawning.name, Game.spawns[data[roomName].spawns[i]].pos.x + 4, Game.spawns[data[roomName].spawns[i]].pos.y + 1, {
@@ -741,6 +779,25 @@ function visuals(roomName) {
         font: 0.4,
         align: 'left',
         color: 'white'
+    })
+    let y = 1
+    for (let i in list) {
+        let count = parseInt(i) + 1
+        new RoomVisual(roomName).text(count + ": " + list[i], 0, y, {
+            font: 0.5,
+            align: 'left',
+            color: 'white',
+            backgroundColor: 'black',
+            backgroundPadding: 0.05
+        })
+        y += 1
+    }
+    new RoomVisual(roomName).text("Spawn queue for " + spawn.name, 0, 0, {
+        font: 0.6,
+        align: 'left',
+        color: 'white',
+        backgroundColor: 'black',
+        backgroundPadding: 0.05
     })
 }
 
