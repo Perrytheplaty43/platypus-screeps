@@ -4,24 +4,20 @@ const data = {
     "E46N42": {
         worker: [MOVE, MOVE, CARRY, WORK, WORK],
         farmer: [MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        carrier: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK],
-        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-            ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-            TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
         claimer: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
             CARRY, CARRY, CARRY, CARRY,
             WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-            WORK, WORK, WORK, WORK, WORK,
-            CARRY, CARRY, CARRY, CARRY],
+        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
-        wall: 100000,
+        wall: 150000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -35,16 +31,16 @@ const data = {
             claimer: 0,
             remoteBuilder: 2,
             reserver: 2,
-            hauler: 4,
+            hauler: 2,
             prospector: 2
         },
         linkFrom: {
-            x: 28,
-            y: 26
+            x: 43,
+            y: 13
         },
         linkTo: {
-            x: 15,
-            y: 36
+            x: 35,
+            y: 13
         },
         remoteMining: {
             "Flag1": "E46N41",
@@ -62,7 +58,7 @@ module.exports.loop = function () {
     }
     jobs('E46N42')
     defendRoom('E46N42', 'Spawn1')
-    //link('W51S37')
+    link('E46N42')
 }
 
 function jobs(roomName) {
@@ -78,6 +74,7 @@ function jobs(roomName) {
     let prospectorCount = 0;
     let spawn = Game.spawns[data[roomName].spawns[0]];
     let sources = Game.rooms[roomName].find(FIND_SOURCES);
+    let isLevel5 = Game.rooms[roomName].energyCapacityAvailable >= 1800
     for (s in sources) {
         let checkCreep = Memory[sources[s].id + "s:c"]
         if (!Game.getObjectById(checkCreep)) {
@@ -103,7 +100,7 @@ function jobs(roomName) {
             if (!Game.getObjectById(checkRemoteBuilder)) {
                 delete Game.flags[f].memory.creepBuilder
             }
-            if (!Game.getObjectById(checkHauler2)) {
+            if (!Game.getObjectById(checkHauler2) || isLevel5) {
                 delete Game.flags[f].memory.creepHauler2
             }
         }
@@ -160,7 +157,7 @@ function jobs(roomName) {
             let creep = Game.creeps[creepname]
             if (creep) {
                 if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) {
-                    let target1 = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[1];
+                    let target1 = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[0];
                     let target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
                         filter: (r) => r.resourceType == RESOURCE_ENERGY && r.amount > 50
                     });
@@ -334,7 +331,7 @@ function jobs(roomName) {
                         });
                         let targetEnergyC = creep.pos.findClosestByPath(FIND_STRUCTURES,
                             {
-                                filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 50)
+                                filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 300)
 
                             });
                         if (targetEnergy) {
@@ -384,7 +381,7 @@ function jobs(roomName) {
                 } else {
                     let targetEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES,
                         {
-                            filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0)
+                            filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 400)
 
                         });
                     let targetStorage = creep.pos.findClosestByPath(FIND_STRUCTURES, {
@@ -565,7 +562,7 @@ function jobs(roomName) {
             if (creep) {
                 let reserverFlags = []
                 for (flag in Game.flags) {
-                    if (Game.flags[flag].secondaryColor == COLOR_GREEN && (!Game.flags[flag].memory.creepHauler || !Game.flags[flag].memory.creepHauler2)) {
+                    if (Game.flags[flag].secondaryColor == COLOR_GREEN && (!Game.flags[flag].memory.creepHauler || (!Game.flags[flag].memory.creepHauler2  && !isLevel5))) {
                         reserverFlags.push(flag)
                     }
                 }
@@ -574,7 +571,7 @@ function jobs(roomName) {
                     if (!creep.memory.reserveFlagId) {
                         if (!Game.flags[reserverFlags[0]].memory.creepHauler) {
                             Game.flags[reserverFlags[0]].memory.creepHauler = creep.id
-                        } else if (!Game.flags[reserverFlags[0]].memory.creepHauler2) {
+                        } else if (!Game.flags[reserverFlags[0]].memory.creepHauler2  && !isLevel5) {
                             Game.flags[reserverFlags[0]].memory.creepHauler2 = creep.id
                         }
                         creep.memory.reserveFlagId = reserverFlags[0]
@@ -584,8 +581,14 @@ function jobs(roomName) {
                     flag = Game.flags[creep.memory.reserveFlagId]
                     if (flag) {
                         if (flag.room) {
+                            if (!creep.store.getFreeCapacity()) {
+                                creep.memory.returning = true
+                            }
+                            if (!creep.store.getUsedCapacity()) {
+                                creep.memory.returning = false
+                            }
                             if (flag.room.name == creep.room.name) {
-                                if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) {
+                                if (!creep.memory.returning) {
                                     let target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
                                         filter: (r) => r.resourceType == RESOURCE_ENERGY && r.amount > 50
                                     });
@@ -599,7 +602,7 @@ function jobs(roomName) {
                                             creep.moveTo(containerTarget1, { maxRooms: 1, visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         }
                                     }
-                                } else if (creep.store.getUsedCapacity() > 0) {
+                                } else if (creep.memory.returning) {
                                     let storageRoom = Game.rooms[roomName].find(FIND_STRUCTURES, {
                                         filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                                     })
@@ -614,7 +617,7 @@ function jobs(roomName) {
                                         }
                                     }
                                 }
-                            } else if (creep.store.getUsedCapacity() > 0) {
+                            } else if (creep.memory.returning) {
                                 let storageRoom = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
                                     filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                                 })
@@ -626,7 +629,7 @@ function jobs(roomName) {
                             } else {
                                 creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
-                        } else if (creep.store.getUsedCapacity() > 0) {
+                        } else if (creep.memory.returning) {
                             let storageRoom = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
                                 filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                             })
@@ -831,6 +834,10 @@ function defendRoom(myRoomName) {
     let hostiles = Game.rooms[myRoomName].find(FIND_HOSTILE_CREEPS);
     let towers = Game.rooms[myRoomName].find(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_TOWER } });
 
+    // for (rooms in data[myRoomName].remoteMining) {
+    //     console.log(rooms)
+    // }
+
     if (towers) {
         //if there are hostiles - attakc them    
         if (hostiles.length > 0) {
@@ -886,7 +893,7 @@ function defendRoom(myRoomName) {
 function link(roomName) {
     const linkFrom = Game.rooms[roomName].lookForAt('structure', data[roomName].linkFrom.x, data[roomName].linkFrom.y)[0];
 
-    const linkTo = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[1];
+    const linkTo = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[0];
 
     if (linkFrom.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
         linkFrom.transferEnergy(linkTo);
