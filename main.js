@@ -4,19 +4,20 @@ const data = {
     "E46N42": {
         worker: [MOVE, MOVE, CARRY, WORK, WORK],
         farmer: [MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
         claimer: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
             CARRY, CARRY, CARRY, CARRY,
             WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
+        mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         wall: 250000,
         spawns: ['Spawn1'],
         oldPoints: 0,
@@ -24,15 +25,16 @@ const data = {
         oldLevel: 1,
         population: {
             worker: 0,
-            farmer: 3,
+            farmer: 2,
             carrier: 2,
-            builder: 2,
+            builder: 1,
             upgrader: 1,
             claimer: 0,
             remoteBuilder: 2,
             reserver: 2,
             hauler: 2,
-            prospector: 2
+            prospector: 2,
+            mineralFarmer: 1,
         },
         linkFrom: [
             [43, 13],
@@ -46,23 +48,50 @@ const data = {
             "Flag1": "E46N41",
             "Flag2": "E47N42"
         },
-        mineralType: RESOURCE_HYDROGEN
+        mineralType: RESOURCE_HYDROGEN,
+        isSelling: true,
+        energyToTerminal: 2200,
     }
 }
-
 let tickCount = 0
 let avgTickCount = 12
 
+//TODO:
+//Auto trade pixel when generated
+//add visual for cpu bucket
+//get hydrogen out of terminal
+//boost creeps
+
 module.exports.loop = function () {
-    if (Game.cpu.bucket == 10000) {
-        Game.cpu.generatePixel();
-    }
     jobs('E46N42')
     defendRoom('E46N42', 'Spawn1')
     link('E46N42')
 }
 
 function jobs(roomName) {
+    if (Game.cpu.bucket == 10000) {
+        Game.cpu.generatePixel();
+        let orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: PIXEL });
+        let ordersRanked = []
+
+        for (order in orders) {
+            let netCreditProfit = orders[order].price * Game.resources[PIXEL]
+            ordersRanked.push([netCreditProfit, orders[order].id])
+        }
+        ordersRanked.sort(sortFunction);
+
+        Game.market.deal(ordersRanked[0][1], Game.resources[PIXEL])
+    }
+    for (let i in Memory.creeps) {
+        if (!Game.creeps[i]) {
+            delete Memory.creeps[i];
+        }
+    }
+    for (let i in Memory.flags) {
+        if (!Game.flags[i]) {
+            delete Memory.flags
+        }
+    }
     let farmersCount = 0;
     let carriersCount = 0;
     let buildersCount = 0;
@@ -73,20 +102,40 @@ function jobs(roomName) {
     let reserverCount = 0;
     let haulerCount = 0;
     let prospectorCount = 0;
+    let mineralFarmerCount = 0;
     let spawn = Game.spawns[data[roomName].spawns[0]];
     let sources = Game.rooms[roomName].find(FIND_SOURCES);
+    let minerals = []
     if (Game.rooms[roomName].find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_EXTRACTOR) })) {
         let mineral = Game.rooms[roomName].find(FIND_MINERALS)[0]
         if (mineral.mineralAmount > 0) {
-            sources.push(mineral)
+            minerals.push(mineral)
+            if (data[roomName].population.mineralFarmer > 0) data[roomName].population.mineralFarmer = 1
+        } else {
+            data[roomName].population.mineralFarmer = 0
         }
     }
-    data[roomName].population.farmer = sources.length
     let isLevel5 = Game.rooms[roomName].energyCapacityAvailable >= 1800
-    for (s in sources) {
-        let checkCreep = Memory[sources[s].id + "s:c"]
+    let farmerTomb = Game.rooms[roomName].find(FIND_TOMBSTONES, { filter: (s) => { return s.creep.name.includes("farmer") } })
+    if (farmerTomb.length) {
+        for (s in sources) {
+            if (!Game.getObjectById(Memory[sources[s].id + "s:c"])) {
+                delete Memory[sources[s].id + "s:c"];
+            }
+        }
+    }
+    if (minerals.length) {
+        let checkCreep = Memory[minerals[0].id + "s:c"]
         if (!Game.getObjectById(checkCreep)) {
-            delete Memory[sources[s].id + "s:c"];
+            delete Memory[minerals[0].id + "s:c"];
+        }
+    }
+    let isSpawningRemote = false
+    for (i in data[roomName].spawns) {
+        if (Game.spawns[data[roomName].spawns[i]].spawning) {
+            if (Game.spawns[data[roomName].spawns[i]].name.includes("reserver") || Game.spawns[data[roomName].spawns[i]].name.includes("remote")) {
+                isSpawningReserver = true
+            }
         }
     }
     if (Game.flags) {
@@ -121,10 +170,15 @@ function jobs(roomName) {
                 if (creep.memory.sourceId) {
                     source = Game.getObjectById(creep.memory.sourceId);
                 } else {
-                    for (source = sources.pop(); source && Memory[source.id + "s:c"]; source = sources.pop()) { }
-                    if (source) {
-                        creep.memory.sourceId = source.id;
-                        Memory[source.id + "s:c"] = creep.id;
+                    if (creepname.includes("mineral")) {
+                        creep.memory.sourceId = minerals[0].id
+                        Memory[minerals[0].id + "s:c"] = creep.id;
+                    } else {
+                        for (source = sources.pop(); source && Memory[source.id + "s:c"]; source = sources.pop()) { }
+                        if (source) {
+                            creep.memory.sourceId = source.id;
+                            Memory[source.id + "s:c"] = creep.id;
+                        }
                     }
                 }
                 if (!source) {
@@ -168,13 +222,17 @@ function jobs(roomName) {
                         }
                     }
                 }
-
-                farmersCount++
+                if (creepname.includes("mineral")) {
+                    mineralFarmerCount++
+                } else {
+                    farmersCount++
+                }
             }
         } else if (creepname.includes('carrier') && Game.creeps[creepname].room == "[room " + roomName + "]") {
             let creep = Game.creeps[creepname]
             if (creep) {
                 if (!creep.store.getUsedCapacity()) {
+                    let terminal = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TERMINAL && s.store.getUsedCapacity() > 0) } })
                     let target1 = Game.rooms[roomName].lookForAt('structure', data[roomName].linkTo.x, data[roomName].linkTo.y)[0];
                     let target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
                         filter: (r) => r.amount > 50
@@ -192,6 +250,14 @@ function jobs(roomName) {
                     } else if (target) {
                         if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(target, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                        }
+                    } else if (!data[roomName].isSelling && terminal) {
+                        if (creep.withdraw(terminal, data[roomName].mineralType) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(terminal, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                        } else if (creep.withdraw(terminal, data[roomName].mineralType) == ERR_NOT_ENOUGH_RESOURCES) {
+                            if (creep.withdraw(terminal, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(terminal, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                            }
                         }
                     } else if (containerTarget1) {
                         if (creep.withdraw(containerTarget1, data[roomName].mineralType) == ERR_NOT_IN_RANGE) {
@@ -240,10 +306,16 @@ function jobs(roomName) {
                                 }
                             } else {
                                 let towers = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TOWER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) } });
+                                let terminal = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TERMINAL && s.store.getUsedCapacity(RESOURCE_ENERGY) < data[roomName].energyToTerminal) } })
+
 
                                 if (towers) {
                                     if (creep.transfer(towers, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                                         creep.moveTo(towers, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
+                                    }
+                                } else if (terminal) {
+                                    if (creep.transfer(terminal, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                        creep.moveTo(terminal, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                     }
                                 } else {
                                     let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
@@ -257,6 +329,19 @@ function jobs(roomName) {
                                             creep.moveTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                         }
                                     }
+                                }
+                            }
+                        } else if (isStoringMineral(creep)) {
+                            let stored_resources = _.filter(Object.keys(creep.store), resource => creep.store[resource] > 0)
+                            let conainterTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
+                                {
+                                    filter: (s) => {
+                                        return (s.structureType == STRUCTURE_STORAGE)
+                                    }
+                                });
+                            if (conainterTarget) {
+                                if (creep.transfer(conainterTarget, stored_resources[0]) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(conainterTarget, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } })
                                 }
                             }
                         } else {
@@ -738,6 +823,8 @@ function jobs(roomName) {
         spawn.spawnCreep(data[roomName].carrier, 'carrier' + id)
     } else if (buildersCount < data[roomName].population.builder) {
         spawn.spawnCreep(data[roomName].builder, 'builder' + id)
+    } else if (mineralFarmerCount < data[roomName].population.mineralFarmer) {
+        spawn.spawnCreep(data[roomName].mineralFarmer, 'mineral-farmer' + id)
     } else if (upgradersCount < data[roomName].population.upgrader) {
         spawn.spawnCreep(data[roomName].upgrader, 'upgrader' + id)
     } else if (claimerCount < data[roomName].population.claimer) {
@@ -762,6 +849,9 @@ function jobs(roomName) {
     }
     if (buildersCount < data[roomName].population.builder) {
         list.push("Builder")
+    }
+    if (mineralFarmerCount < data[roomName].population.mineralFarmer) {
+        list.push("Mineral Farmer")
     }
     if (upgradersCount < data[roomName].population.upgrader) {
         list.push("Upgrader")
@@ -963,4 +1053,40 @@ function addHours(numOfHours) {
     date.setTime(date.getTime() + numOfHours * 60 * 60 * 1000);
 
     return date.toLocaleString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: "America/Los_Angeles", hour: '2-digit', minute: '2-digit' });
+}
+
+
+module.exports.findBestOrder = function findBestOrder(resourceType, roomName, energyCost) {
+    let orders = Game.market.getAllOrders({ type: ORDER_BUY, resourceType: resourceType });
+
+    let ordersRanked = []
+
+    for (order in orders) {
+        let terminal = Game.rooms[roomName].find(FIND_STRUCTURES, { filter: (s) => { return (s.structureType == STRUCTURE_TERMINAL) } })
+        //let terminalStore = terminal[0].store[resourceType]
+        let terminalStore = 1100
+        let amount = (orders[order].amount > terminalStore) ? terminalStore : orders[order].amount
+        let netCreditProfit = (orders[order].price * amount) - (Game.market.calcTransactionCost(amount, roomName, orders[order].roomName) * energyCost)
+        ordersRanked.push([netCreditProfit, orders[order].id, Game.market.calcTransactionCost(amount, roomName, orders[order].roomName)])
+    }
+    ordersRanked.sort(sortFunction);
+    for (i in ordersRanked) {
+        let order = Game.market.getOrderById(ordersRanked[i][1])
+        console.log("Id:", order.id, "Price:", order.price, "Available:", order.amount, "Room:", order.roomName, "Net Credit Profit:", ordersRanked[i][0], "Transtaction Cost:", ordersRanked[i][2], "\n")
+    }
+}
+
+function sortFunction(a, b) {
+    if (a[0] === b[0]) {
+        return 0;
+    }
+    else {
+        return (a[0] > b[0]) ? -1 : 1;
+    }
+}
+
+function isStoringMineral(that) {
+    if (that.store[RESOURCE_HYDROGEN] || that.store[RESOURCE_OXYGEN] || that.store[RESOURCE_UTRIUM] || that.store[RESOURCE_LEMERGIUM] || that.store[RESOURCE_KEANIUM] || that.store[RESOURCE_ZYNTHIUM] || that.store[RESOURCE_CATALYST] || that.store[RESOURCE_GHODIUM]) {
+        return true
+    }
 }
