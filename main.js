@@ -16,7 +16,7 @@ const data = {
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        wall: 250000,
+        wall: 300000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -59,11 +59,11 @@ const data = {
     },
     "E49N43": {
         worker: [MOVE, CARRY, WORK, WORK],
-        farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY, CARRY, CARRY],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY, CARRY, CARRY],
-        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        farmer: [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
+        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
@@ -82,7 +82,7 @@ const data = {
             farmer: 2,
             carrier: 2,
             builder: 2,
-            upgrader: 6,
+            upgrader: 2,
             claimer: 0,
             remoteBuilder: 0,
             reserver: 0,
@@ -125,6 +125,8 @@ module.exports.loop = function () {
 
     jobs('E49N43')
     defendRoom('E49N43', 'Spawn2')
+
+    exportStats()
 }
 
 function jobs(roomName) {
@@ -320,7 +322,6 @@ function jobs(roomName) {
                             creep.moveTo(labProduct, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                         }
                     } else if (data[roomName].labs.isReacting && Game.rooms[roomName].energyAvailable == Game.rooms[roomName].energyCapacityAvailable && !testTower) {
-                        console.log(creepname, labProduct)
                         let lab1 = Game.getObjectById(data[roomName].labs.reactant1[0])
                         let lab2 = Game.getObjectById(data[roomName].labs.reactant2[0])
                         let supplyLab1 = false
@@ -1202,6 +1203,18 @@ function visuals(roomName, list, spawn) {
         backgroundColor: 'black',
         backgroundPadding: 0.05
     })
+    //cpu bucket
+    new RoomVisual(roomName).poly([[16, 0], [22, 0], [22, 0.7], [16, 0.7], [16, 0]], { stroke: "green" })
+    new RoomVisual(roomName).rect(16, 0, 6 * (Game.cpu.bucket / 10000), 0.7, { fill: "green" })
+    new RoomVisual(roomName).text("CPU Bucket: " + Game.cpu.bucket, 16.1, 0.54, { font: 0.5, align: 'left', color: "white" })
+    //room energy
+    new RoomVisual(roomName).poly([[22.5, 0], [28.5, 0], [28.5, 0.7], [22.5, 0.7], [22.5, 0]], { stroke: "#FFFF00" })
+    new RoomVisual(roomName).rect(22.5, 0, 6 * (Game.rooms[roomName].energyAvailable / Game.rooms[roomName].energyCapacityAvailable), 0.7, { fill: "#FFFF00" })
+    new RoomVisual(roomName).text("Spawn Energy: " + Game.rooms[roomName].energyAvailable + "/" + Game.rooms[roomName].energyCapacityAvailable, 22.6, 0.54, { font: 0.5, align: 'left', color: "white" })
+    //level
+    new RoomVisual(roomName).poly([[29, 0], [49, 0], [49, 0.7], [29, 0.7], [29, 0]], { stroke: "#ADD8E6" })
+    new RoomVisual(roomName).rect(29, 0, 20 * (Game.rooms[roomName].controller.progress / Game.rooms[roomName].controller.progressTotal), 0.7, { fill: "#ADD8E6" })
+    new RoomVisual(roomName).text("Controller Level: " + nFormatter(Game.rooms[roomName].controller.progress, 1) + "/" + nFormatter(Game.rooms[roomName].controller.progressTotal, 1), 29.1, 0.54, { font: 0.5, align: 'left', color: "white" })
 }
 
 function getTTU(roomName, raw) {
@@ -1243,7 +1256,7 @@ function defendRoom(myRoomName) {
         if (hostiles.length > 0) {
             let walls = Game.rooms[myRoomName].find(FIND_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART });
             for (let wall of walls) {
-                if (wall.hits <= 5) {
+                if (wall.hits <= 100) {
                     Game.rooms[myRoomName].controller.activateSafeMode();
                 }
             }
@@ -1383,5 +1396,81 @@ function sortFunction(a, b) {
 function isStoringMineral(that) {
     if (that.store[RESOURCE_HYDROGEN] || that.store[RESOURCE_OXYGEN] || that.store[RESOURCE_UTRIUM] || that.store[RESOURCE_LEMERGIUM] || that.store[RESOURCE_KEANIUM] || that.store[RESOURCE_ZYNTHIUM] || that.store[RESOURCE_CATALYST] || that.store[RESOURCE_GHODIUM]) {
         return true
+    }
+}
+
+// Call this function at the end of your main loop
+
+function exportStats() {
+    // Reset stats object
+    Memory.stats = {
+        gcl: {},
+        rooms: {},
+        cpu: {},
+        credits: {},
+        market: {},
+    };
+
+    if (!Memory.stats.date) {
+        Memory.stats.date = Date.now()
+    }
+
+    Memory.stats.time = Game.time;
+
+    // Collect room stats
+    for (let roomName in Game.rooms) {
+        let room = Game.rooms[roomName];
+        let isMyRoom = (room.controller ? room.controller.my : false);
+        if (isMyRoom) {
+            let roomStats = Memory.stats.rooms[roomName] = {};
+            roomStats.storageEnergy = (room.storage ? room.storage.store.energy : 0);
+            roomStats.terminalEnergy = (room.terminal ? room.terminal.store.energy : 0);
+            roomStats.energyAvailable = room.energyAvailable;
+            roomStats.energyCapacityAvailable = room.energyCapacityAvailable;
+            roomStats.controllerProgress = room.controller.progress;
+            roomStats.controllerProgressTotal = room.controller.progressTotal;
+            roomStats.controllerLevel = room.controller.level;
+        }
+    }
+
+    // Collect GCL stats
+    Memory.stats.gcl.progress = Game.gcl.progress;
+    Memory.stats.gcl.progressTotal = Game.gcl.progressTotal;
+    Memory.stats.gcl.level = Game.gcl.level;
+
+    // Collect CPU stats
+    Memory.stats.cpu.bucket = Game.cpu.bucket;
+    Memory.stats.cpu.limit = Game.cpu.limit;
+    Memory.stats.cpu.used = Game.cpu.getUsed();
+
+    //Credits
+    Memory.stats.credits = Game.market.credits
+
+    //Market
+    const d1 = new Date().getDate();
+    const d2 = new Date(Memory.stats.date).getDate();
+    if (d2 !== d1) {
+        let h = Game.market.getHistory(RESOURCE_HYDROGEN)
+        Memory.stats.market.h = h[h.length - 1].avgPrice
+
+        let l = Game.market.getHistory(RESOURCE_LEMERGIUM)
+        Memory.stats.market.l = l[l.length - 1].avgPrice
+
+        let lh = Game.market.getHistory(RESOURCE_LEMERGIUM_HYDRIDE)
+        Memory.stats.market.lh = lh[lh.length - 1].avgPrice
+        Memory.stats.market.lhUser = Memory.stats.market.h + Memory.stats.market.l
+
+        let o = Game.market.getHistory(RESOURCE_OXYGEN)
+        Memory.stats.market.o = o[o.length - 1].avgPrice
+
+        let oh = Game.market.getHistory(RESOURCE_HYDROXIDE)
+        Memory.stats.market.oh = oh[oh.length - 1].avgPrice
+        Memory.stats.market.ohUser = Memory.stats.market.h + Memory.stats.market.o
+
+        let lh2o = Game.market.getHistory(RESOURCE_LEMERGIUM_ACID)
+        Memory.stats.market.lh2o = lh2o[lh2o.length - 1].avgPrice
+        Memory.stats.market.lh2oUser = Memory.stats.market.l + Memory.stats.market.h * 2 + Memory.stats.market.o
+
+        Memory.stats.date = Date.now()
     }
 }
