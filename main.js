@@ -1,4 +1,5 @@
 let Traveler = require('Traveler');
+let roomPlanner = require('room-planning-test')
 
 const data = {
     "E46N42": {
@@ -8,7 +9,7 @@ const data = {
         builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
-        defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
+        defenderLo: [TOUGH, MOVE, ATTACK, ATTACK, ATTACK],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
@@ -16,7 +17,7 @@ const data = {
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        wall: 300000,
+        wall: 400000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -65,7 +66,7 @@ const data = {
         builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
-        defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
+        defenderLo: [TOUGH, MOVE, ATTACK, ATTACK, ATTACK],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
@@ -121,6 +122,7 @@ const data = {
         carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
         upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
+        defenderLo: [TOUGH, MOVE, ATTACK, ATTACK, ATTACK],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY],
@@ -135,11 +137,11 @@ const data = {
         TTU: 0,
         oldLevel: 1,
         population: {
-            worker: 3,
+            worker: 0,
             farmer: 2,
             carrier: 2,
-            builder: 2,
-            upgrader: 1,
+            builder: 1,
+            upgrader: 2,
             claimer: 0,
             remoteBuilder: 0,
             reserver: 0,
@@ -1350,12 +1352,12 @@ function jobs(roomName) {
     if (targetStorage) {
         if ((carriersCount == 0 || !targetStorage.store[RESOURCE_ENERGY]) && Game.rooms[roomName].energyAvailable < Game.rooms[roomName].energyCapacityAvailable) {
             data[roomName].population.worker = 6
-            roomName
+            Game.notify(`${Game.time}: Room ${roomName} in recovery mode.`);
         }
     } else {
         if (carriersCount == 0 && Game.rooms[roomName].energyAvailable < Game.rooms[roomName].energyCapacityAvailable && Game.rooms[roomName].controller.level > 2) {
-            console.log(roomName)
             data[roomName].population.worker = 6
+            Game.notify(`${Game.time}: Room ${roomName} in recovery mode.`);
         }
     }
 
@@ -1543,7 +1545,6 @@ function defendRoom(myRoomName) {
 
         //if there are no hostiles....
         if (hostiles.length === 0) {
-
             //....first heal any damaged creeps
             for (let name in Game.creeps) {
                 // get the creep object
@@ -1681,8 +1682,8 @@ function exportStats() {
         market: {},
     };
 
-    if (!Memory.stats.date) {
-        Memory.stats.date = Date.now()
+    if (!Memory.date) {
+        Memory.date = Date.now()
     }
 
     Memory.stats.time = Game.time;
@@ -1717,9 +1718,7 @@ function exportStats() {
     Memory.stats.credits = Game.market.credits
 
     //Market
-    const d1 = new Date().getDate();
-    const d2 = new Date(Memory.stats.date).getDate();
-    if (d2 !== d1) {
+    if (Memory.date < Date.now() - 86400000) {
         let h = Game.market.getHistory(RESOURCE_HYDROGEN)
         Memory.stats.market.h = h[h.length - 1].avgPrice
 
@@ -1741,6 +1740,6 @@ function exportStats() {
         Memory.stats.market.lh2o = lh2o[lh2o.length - 1].avgPrice
         Memory.stats.market.lh2oUser = Memory.stats.market.l + Memory.stats.market.h * 2 + Memory.stats.market.o
 
-        Memory.stats.date = Date.now()
+        Memory.date = Date.now()
     }
 }
