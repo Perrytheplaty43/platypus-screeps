@@ -11,8 +11,8 @@ const data = {
         carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
-        defenderLo: [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK],
+        defenderHiMelee: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        defenderHiRanged: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
@@ -146,8 +146,8 @@ const data = {
             carrier: 2,
             builder: 1,
             upgrader: 2,
-            claimer: 0,
-            remoteBuilder: 1,
+            claimer: 1,
+            remoteBuilder: 4,
             reserver: 1,
             hauler: 1,
             prospector: 1,
@@ -155,19 +155,25 @@ const data = {
             robber: 3,
         },
         linkFrom: [
-            [43, 13],
+            [24, 18],
             [28, 10]
         ],
         linkTo: {
-            x: 35,
-            y: 13
+            x: 15,
+            y: 24
         },
         remoteMining: {
             "Flag5": "E55N39",
             "Flag6": "E54N37",
             "Flag7": "E54N37",
             "Flag8": "E54N37",
-            "temp-1": "E54N38"
+            "claim": "E57N38",
+            "Flag9": "E57N38",
+            "Flag10": "E57N38",
+            "Flag11": "E57N38",
+            "temp-1": "E54N38",
+            "temp-2": "E55N38",
+            "temp-3": "E56N38"
         },
         mineralType: RESOURCE_LEMERGIUM_ALKALIDE,
         //mineralType: RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
@@ -234,11 +240,63 @@ const data = {
             reactant2: ["",],
             product: ["",]
         }
+    },
+    "E57N38": {
+        worker: [MOVE, MOVE, WORK, CARRY],
+        farmer: [MOVE, MOVE, WORK, WORK, WORK, WORK, CARRY],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, CARRY, CARRY],
+        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        claimer: [MOVE, CLAIM],
+        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY],
+        reserver: [MOVE, MOVE, CLAIM, CLAIM],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        tester: [MOVE],
+        mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        wall: 1000,
+        spawns: ['Spawnundefined2'],
+        oldPoints: 0,
+        TTU: 0,
+        oldLevel: 1,
+        population: {
+            worker: 6,
+            farmer: 0,
+            carrier: 0,
+            builder: 0,
+            upgrader: 0,
+            claimer: 0,
+            remoteBuilder: 0,
+            reserver: 0,
+            hauler: 0,
+            prospector: 0,
+            mineralFarmer: 0,
+        },
+        linkFrom: [
+            [43, 13],
+            [28, 10]
+        ],
+        linkTo: {
+            x: 35,
+            y: 13
+        },
+        remoteMining: {},
+        mineralType: RESOURCE_GHODIUM_OXIDE,
+        isSelling: false,
+        energyToTerminal: 2200,
+        terminalWithdraw: RESOURCE_GHODIUM_OXIDE,
+        labs: {
+            isReacting: false,
+            empty: false,
+            reactant1: ["",],
+            reactant2: ["",],
+            product: ["",]
+        }
     }
 }
 let tickCount = 0
 let avgTickCount = 12
-let workersCPU = 0
 //TODO:
 //boost creeps
 
@@ -257,15 +315,47 @@ module.exports.loop = function () {
     link('E49N43')
     //============================
 
-    //E54N39----------------------
-    jobs('E54N39')
-    defendRoom('E54N39', 'Spawn3')
-    //============================
-
+    
     //E59N37----------------------
     roomPlanner('E59N37')
     jobs('E59N37')
     defendRoom('E59N37', 'Spawnundefined2')
+    //============================
+
+    //E57N38----------------------
+    roomPlanner('E57N38')
+    if (Game.spawns['Spawn6']) {
+        Game.flags['claim'].remove()
+        data['E54N39'].population.claimer = 0
+        if (Game.rooms['E57N38'].controller.level > 1) {
+            Game.flags['Flag9'].remove()
+            Game.flags['Flag10'].remove()
+            Game.flags['Flag11'].remove()
+            data['E54N39'].population.remoteBuilder = 1
+        }
+        if (Game.rooms['E57N38'].energyCapacityAvailable >= 550) {
+            data['E57N38'].population = {
+                worker: 0,
+                farmer: 1,
+                carrier: 2,
+                builder: 1,
+                upgrader: 4,
+                claimer: 0,
+                remoteBuilder: 0,
+                reserver: 0,
+                hauler: 0,
+                prospector: 0,
+                mineralFarmer: 0,
+            }
+        }
+        jobs('E57N38')
+    }
+    //============================
+    
+    //E54N39----------------------
+    jobs('E54N39')
+    defendRoom('E54N39', 'Spawn3')
+    link('E54N39')
     //============================
 
     mapVisuals()
@@ -322,6 +412,7 @@ function jobs(roomName) {
     let prospectorCount = 0;
     let mineralFarmerCount = 0;
     let robberCount = 0;
+    let defenderCount = 0;
     let spawn = Game.spawns[data[roomName].spawns[0]];
     let sources = Game.rooms[roomName].find(FIND_SOURCES);
     let minerals = []
@@ -1218,6 +1309,7 @@ function jobs(roomName) {
                         creep.moveTo(target, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } });
                     }
                 }
+                defenderCount++
             }
         } else if (creepname.includes('claimer') && (Game.creeps[creepname].room == "[room " + roomName + "]" || (() => { for (flag in data[roomName].remoteMining) { if (Game.creeps[creepname].room.name == data[roomName].remoteMining[flag]) { return true } } })())) {
             creep = Game.creeps[creepname]
@@ -1889,13 +1981,17 @@ function defendRoom(myRoomName) {
             if (attackLength > 25 && healLength > 4) {
                 shouldDefend = true
             }
+            if (attackLength && blackList.includes(username)) {
+                Game.rooms[myRoomName].controller.activateSafeMode()
+            }
             if (shouldDefend) {
-                //TODO: add spawning logic, add count
                 let id = Math.floor(1000 + Math.random() * 9000);
-                if (Game.spawns[data[myRoomName].spawns[0]].canCreateCreep(data[myRoomName].defenderHi, 'defender' + id) == OK) {
-                    Game.spawns[data[myRoomName].spawns[0]].createCreep(data[myRoomName].defenderHi, 'defender' + id);
-                } else {
-                    Game.spawns[data[myRoomName].spawns[0]].createCreep(data[myRoomName].defenderLo, 'defender' + id);
+                if (defenderCount <= hostiles.length) {
+                    if (rangedAttack) {
+                        Game.spawns[data[myRoomName].spawns[0]].spawnCreep(data[myRoomName].defenderHiRanged, 'defender' + id);
+                    } else {
+                        Game.spawns[data[myRoomName].spawns[0]].spawnCreep(data[myRoomName].defenderHiMelee, 'defender' + id);
+                    }
                 }
             }
             Game.notify(`${Game.time}: User ${username} spotted in room ${myRoomName} | Replay: https://screeps.com/a/#!/history/${Game.shard.name}/${myRoomName}?t=${Game.time - 15}`);

@@ -4,11 +4,8 @@ let roomPlanner = function roomPlanner(roomName) {
             [roomName]: {}
         }
     } else if (!Memory.rooms[roomName]) {
-        Memory.rooms = {
-            [roomName]: {}
-        }
+        Memory.rooms[roomName] = {}
     } else if (!Memory.rooms[roomName].plan) {
-        console.log(roomName)
         let coords = findCenter(Game.rooms[roomName])
         writeToMemory(coords, roomName)
     } else if (!Memory.rooms[roomName].plan.level) {
@@ -17,8 +14,10 @@ let roomPlanner = function roomPlanner(roomName) {
         let plan = Memory.rooms[roomName].plan
         if (Game.rooms[roomName].controller.level == 1) {
             let spawns = Game.rooms[roomName].find(FIND_MY_SPAWNS)[0];
+            let spawnsLength = 0
+            for (i in Game.spawns) spawnsLength++
             if (!spawns) {
-                Game.rooms[roomName].createConstructionSite(plan.lvl1.spawns[0][0], plan.lvl1.spawns[0][1], STRUCTURE_SPAWN, "Spawn" + Game.spawns.length + 2)
+                Game.rooms[roomName].createConstructionSite(plan.lvl1.spawns[0][0], plan.lvl1.spawns[0][1], STRUCTURE_SPAWN, "Spawn" + (spawnsLength + 2))
             }
             Memory.rooms[roomName].plan.level = Game.rooms[roomName].controller.level
         } else if (Memory.rooms[roomName].plan.level != Game.rooms[roomName].controller.level) {
@@ -230,10 +229,8 @@ function writeToMemory(coords, roomName) {
             nuker: [x + 1, y - 3]
         }
     }
-    Memory.rooms = {
-        [roomName]: {
-            plan: positions
-        }
+    Memory.rooms[roomName] = {
+        plan: positions
     }
 }
 
@@ -243,7 +240,7 @@ function findCenter(room) {
 
     for (let x = 0; x <= 49; x++) {
         for (let y = 0; y <= 49; y++) {
-            if (terrian.get(x, y) == TERRAIN_MASK_WALL || room.lookForAt('structure', x, y).length) {
+            if (terrian.get(x, y) == TERRAIN_MASK_WALL || room.lookForAt('structure', x, y).length || x == 0 || y == 0 || x == 49 || y == 49) {
                 if (x >= 2 && x <= 48 && y >= 1 && y <= 48) {
                     if ((terrian.get(x + 1, y) == TERRAIN_MASK_WALL || room.lookForAt('structure', x + 1, y).length) &&
                         (terrian.get(x + 1, y + 1) == TERRAIN_MASK_WALL || room.lookForAt('structure', x + 1, y + 1).length) &&
