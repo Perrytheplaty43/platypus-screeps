@@ -20,7 +20,7 @@ const data = {
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        wall: 4000000,
+        wall: 2000000,
         spawns: ['Spawn1'],
         oldPoints: 0,
         TTU: 0,
@@ -145,14 +145,14 @@ const data = {
             farmer: 2,
             carrier: 2,
             builder: 1,
-            upgrader: 2,
+            upgrader: 1,
             claimer: 1,
             remoteBuilder: 4,
             reserver: 1,
             hauler: 1,
             prospector: 1,
             mineralFarmer: 0,
-            robber: 3,
+            robber: 1,
         },
         linkFrom: [
             [24, 18],
@@ -202,7 +202,7 @@ const data = {
         prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        wall: 1000,
+        wall: 5000,
         spawns: ['Spawnundefined2'],
         oldPoints: 0,
         TTU: 0,
@@ -256,7 +256,7 @@ const data = {
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         wall: 1000,
-        spawns: ['Spawnundefined2'],
+        spawns: ['Spawn6'],
         oldPoints: 0,
         TTU: 0,
         oldLevel: 1,
@@ -304,7 +304,7 @@ module.exports.loop = function () {
     //N46N42----------------------
     if (Game.spawns['Spawn1']) {
         jobs('E46N42')
-        //defendRoom('E46N42', 'Spawn1')
+        defendRoom('E46N42', 'Spawn1')
         link('E46N42')
     }
     //============================
@@ -315,6 +315,11 @@ module.exports.loop = function () {
     link('E49N43')
     //============================
 
+    //E54N39----------------------
+    jobs('E54N39')
+    defendRoom('E54N39', 'Spawn3')
+    link('E54N39')
+    //============================
     
     //E59N37----------------------
     roomPlanner('E59N37')
@@ -324,39 +329,9 @@ module.exports.loop = function () {
 
     //E57N38----------------------
     roomPlanner('E57N38')
-    if (Game.spawns['Spawn6']) {
-        Game.flags['claim'].remove()
-        data['E54N39'].population.claimer = 0
-        if (Game.rooms['E57N38'].controller.level > 1) {
-            Game.flags['Flag9'].remove()
-            Game.flags['Flag10'].remove()
-            Game.flags['Flag11'].remove()
-            data['E54N39'].population.remoteBuilder = 1
-        }
-        if (Game.rooms['E57N38'].energyCapacityAvailable >= 550) {
-            data['E57N38'].population = {
-                worker: 0,
-                farmer: 1,
-                carrier: 2,
-                builder: 1,
-                upgrader: 4,
-                claimer: 0,
-                remoteBuilder: 0,
-                reserver: 0,
-                hauler: 0,
-                prospector: 0,
-                mineralFarmer: 0,
-            }
-        }
-        jobs('E57N38')
-    }
+    jobs('E57N38')
     //============================
     
-    //E54N39----------------------
-    jobs('E54N39')
-    defendRoom('E54N39', 'Spawn3')
-    link('E54N39')
-    //============================
 
     mapVisuals()
 
@@ -1152,7 +1127,7 @@ function jobs(roomName) {
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                     let rampTarget = creep.pos.findClosestByPath(FIND_STRUCTURES,
                         {
-                            filter: (s) => (s.structureType == STRUCTURE_RAMPART && s.hits < data[roomName].wall)
+                            filter: (s) => (s.structureType == STRUCTURE_RAMPART && s.hits < data[roomName].wall && !(s.room.name == "E46N42" && ((s.pos.x == 34 && s.pos.y == 31) || (s.pos.x == 34 && s.pos.y == 32))))
                         })
                     if (rampTarget) {
                         if (creep.repair(rampTarget) == ERR_NOT_IN_RANGE) {
