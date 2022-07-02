@@ -8,6 +8,7 @@ let roomPlanner = function roomPlanner(roomName) {
             [roomName]: {}
         }
     } else if (!Memory.rooms[roomName].plan) {
+        console.log(roomName)
         let coords = findCenter(Game.rooms[roomName])
         writeToMemory(coords, roomName)
     } else if (!Memory.rooms[roomName].plan.level) {
