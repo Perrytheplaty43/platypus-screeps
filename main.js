@@ -86,8 +86,8 @@ const data = {
             worker: 0,
             farmer: 2,
             carrier: 2,
-            builder: 1,
-            upgrader: 2,
+            builder: 2,
+            upgrader: 1,
             claimer: 0,
             remoteBuilder: 2,
             reserver: 2,
@@ -146,13 +146,13 @@ const data = {
             carrier: 2,
             builder: 1,
             upgrader: 1,
-            claimer: 1,
-            remoteBuilder: 4,
+            claimer: 0,
+            remoteBuilder: 1,
             reserver: 1,
             hauler: 1,
             prospector: 1,
             mineralFarmer: 0,
-            robber: 1,
+            robber: 0,
         },
         linkFrom: [
             [24, 18],
@@ -167,13 +167,6 @@ const data = {
             "Flag6": "E54N37",
             "Flag7": "E54N37",
             "Flag8": "E54N37",
-            "claim": "E57N38",
-            "Flag9": "E57N38",
-            "Flag10": "E57N38",
-            "Flag11": "E57N38",
-            "temp-1": "E54N38",
-            "temp-2": "E55N38",
-            "temp-3": "E56N38"
         },
         mineralType: RESOURCE_LEMERGIUM_ALKALIDE,
         //mineralType: RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
@@ -189,17 +182,17 @@ const data = {
         }
     },
     "E59N37": {
-        worker: [MOVE, MOVE, CARRY, WORK, WORK],
+        worker: [MOVE, CARRY, WORK, WORK],
         farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY, CARRY, CARRY],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY, CARRY, CARRY],
-        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
+        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         wall: 5000,
@@ -243,16 +236,16 @@ const data = {
     },
     "E57N38": {
         worker: [MOVE, MOVE, WORK, CARRY],
-        farmer: [MOVE, MOVE, WORK, WORK, WORK, WORK, CARRY],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, CARRY, CARRY],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, CARRY, CARRY],
+        farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY, CARRY, CARRY],
         defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
         claimer: [MOVE, CLAIM],
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        prospector: [MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         wall: 1000,
@@ -261,16 +254,16 @@ const data = {
         TTU: 0,
         oldLevel: 1,
         population: {
-            worker: 6,
-            farmer: 0,
-            carrier: 0,
-            builder: 0,
-            upgrader: 0,
+            worker: 0,
+            farmer: 1,
+            carrier: 2,
+            builder: 1,
+            upgrader: 4,
             claimer: 0,
             remoteBuilder: 0,
             reserver: 0,
-            hauler: 0,
-            prospector: 0,
+            hauler: 1,
+            prospector: 1,
             mineralFarmer: 0,
         },
         linkFrom: [
@@ -281,7 +274,9 @@ const data = {
             x: 35,
             y: 13
         },
-        remoteMining: {},
+        remoteMining: {
+            "Flag6": "E58N38"
+        },
         mineralType: RESOURCE_GHODIUM_OXIDE,
         isSelling: false,
         energyToTerminal: 2200,
@@ -301,14 +296,6 @@ let avgTickCount = 12
 //boost creeps
 
 module.exports.loop = function () {
-    //N46N42----------------------
-    if (Game.spawns['Spawn1']) {
-        jobs('E46N42')
-        defendRoom('E46N42', 'Spawn1')
-        link('E46N42')
-    }
-    //============================
-
     //E49N43----------------------
     jobs('E49N43')
     defendRoom('E49N43', 'Spawn2')
@@ -320,7 +307,7 @@ module.exports.loop = function () {
     defendRoom('E54N39', 'Spawn3')
     link('E54N39')
     //============================
-    
+
     //E59N37----------------------
     roomPlanner('E59N37')
     jobs('E59N37')
@@ -330,14 +317,15 @@ module.exports.loop = function () {
     //E57N38----------------------
     roomPlanner('E57N38')
     jobs('E57N38')
+    defendRoom('E57N38', 'Spawn6')
     //============================
-    
+
 
     mapVisuals()
 
     exportStats()
 }
-
+let defenderCount = 0
 function jobs(roomName) {
     if (Game.cpu.bucket == 10000) {
         Game.cpu.generatePixel();
@@ -364,17 +352,17 @@ function jobs(roomName) {
             delete Memory.flags
         }
     }
-    if (data[roomName].labs.reactant1[0] && data[roomName].labs.reactant2[0] && data[roomName].labs.product[0]) {
-        let reactant1 = Game.getObjectById(data[roomName].labs.reactant1[0])
-        let reactant2 = Game.getObjectById(data[roomName].labs.reactant2[0])
-        let product = Game.getObjectById(data[roomName].labs.product[0])
+    // if (data[roomName].labs.reactant1[0] && data[roomName].labs.reactant2[0] && data[roomName].labs.product[0]) {
+    //     let reactant1 = Game.getObjectById(data[roomName].labs.reactant1[0])
+    //     let reactant2 = Game.getObjectById(data[roomName].labs.reactant2[0])
+    //     let product = Game.getObjectById(data[roomName].labs.product[0])
 
-        if (reactant1.store && reactant2.store) {
-            if (reactant1.store[data[roomName].labs.reactant1[1]] && reactant2.store[data[roomName].labs.reactant2[1]]) {
-                product.runReaction(reactant1, reactant2)
-            }
-        }
-    }
+    //     if (reactant1.store && reactant2.store) {
+    //         if (reactant1.store[data[roomName].labs.reactant1[1]] && reactant2.store[data[roomName].labs.reactant2[1]]) {
+    //             product.runReaction(reactant1, reactant2)
+    //         }
+    //     }
+    // }
     let farmersCount = 0;
     let carriersCount = 0;
     let buildersCount = 0;
@@ -387,7 +375,6 @@ function jobs(roomName) {
     let prospectorCount = 0;
     let mineralFarmerCount = 0;
     let robberCount = 0;
-    let defenderCount = 0;
     let spawn = Game.spawns[data[roomName].spawns[0]];
     let sources = Game.rooms[roomName].find(FIND_SOURCES);
     let minerals = []
@@ -1507,36 +1494,104 @@ function jobs(roomName) {
                                     let storageRoom = Game.rooms[roomName].find(FIND_STRUCTURES, {
                                         filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                                     })
-                                    if (storageRoom) {
+                                    let container = Game.rooms[roomName].find(FIND_STRUCTURES, {
+                                        filter: (s) => (s.structureType == STRUCTURE_CONTAINER)
+                                    })
+                                    if (storageRoom.length) {
                                         if (roomName != creep.room.name) {
                                             let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
                                             creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
-                                        } else if (creep.transfer(storageRoom, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                            creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                        } else if (creep.transfer(storageRoom[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                            creep.moveTo(storageRoom[0], { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         } else {
-                                            creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                            creep.moveTo(storageRoom[0], { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                        }
+                                    } else if (container) {
+                                        let container1
+                                        if (roomName == creep.room.name) {
+                                            container1 = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                                filter: (s) => (s.structureType == STRUCTURE_CONTAINER)
+                                            })
+                                        }
+                                        if (roomName != creep.room.name) {
+                                            let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
+                                            creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                        } else if (creep.transfer(container1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                            creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                        } else {
+                                            console.log(creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } }))
+                                            creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                         }
                                     }
                                 }
                             } else if (creep.memory.returning) {
-                                let storageRoom = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                                let storageRoom = Game.rooms[roomName].find(FIND_STRUCTURES, {
                                     filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                                 })
-                                if (storageRoom) {
-                                    if (creep.transfer(storageRoom, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                        creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                let container = Game.rooms[roomName].find(FIND_STRUCTURES, {
+                                    filter: (s) => (s.structureType == STRUCTURE_CONTAINER)
+                                })
+                                if (storageRoom.length) {
+                                    if (roomName != creep.room.name) {
+                                        let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
+                                        creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                    } else if (creep.transfer(storageRoom[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                        creep.moveTo(storageRoom[0], { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                    } else {
+                                        creep.moveTo(storageRoom[0], { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                    }
+                                } else if (container) {
+                                    let container1
+                                    if (roomName == creep.room.name) {
+                                        container1 = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                            filter: (s) => (s.structureType == STRUCTURE_CONTAINER)
+                                        })
+                                    }
+                                    if (roomName != creep.room.name) {
+                                        let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
+                                        creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                    } else if (creep.transfer(container1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                        creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                    } else {
+                                        console.log(creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } }))
+                                        creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                     }
                                 }
                             } else {
                                 creep.moveTo(flag, { visualizePathStyle: { stroke: '#ff00ae', opacity: 0.9 } })
                             }
                         } else if (creep.memory.returning) {
-                            let storageRoom = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+
+                            let storageRoom = Game.rooms[roomName].find(FIND_STRUCTURES, {
                                 filter: (s) => (s.structureType == STRUCTURE_STORAGE)
                             })
-                            if (storageRoom) {
-                                if (creep.transfer(storageRoom, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(storageRoom, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                            let container = Game.rooms[roomName].find(FIND_STRUCTURES, {
+                                filter: (s) => (s.structureType == STRUCTURE_CONTAINER)
+                            })
+                            if (storageRoom.length) {
+                                if (roomName != creep.room.name) {
+                                    let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
+                                    creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                } else if (creep.transfer(storageRoom[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(storageRoom[0], { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                } else {
+                                    creep.moveTo(storageRoom[0], { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                }
+                            } else if (container) {
+                                let container1
+                                if (roomName == creep.room.name) {
+                                    container1 = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                        filter: (s) => (s.structureType == STRUCTURE_CONTAINER)
+                                    })
+                                }
+                                if (roomName != creep.room.name) {
+                                    let roomHome = new RoomPosition(spawn.pos.x, spawn.pos.y, roomName)
+                                    creep.moveTo(roomHome, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                } else if (creep.transfer(container1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
+                                } else {
+                                    console.log(creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } }))
+                                    creep.moveTo(container1, { visualizePathStyle: { stroke: '#ff1100', opacity: 0.9 } });
                                 }
                             }
                         } else {
@@ -1953,7 +2008,7 @@ function defendRoom(myRoomName) {
                     }
                 }
             }
-            if (attackLength > 25 && healLength > 4) {
+            if (attackLength > 4 && healLength > 4) {
                 shouldDefend = true
             }
             if (attackLength && blackList.includes(username)) {
