@@ -5,63 +5,6 @@ let mapVisuals = require('map-visuals')
 let blackList = ["asdpof"]
 
 const data = {
-    "E46N42": {
-        worker: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK],
-        farmer: [MOVE, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        defenderHiMelee: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
-        defenderHiRanged: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK],
-        claimer: [MOVE, CLAIM],
-        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        tester: [MOVE],
-        mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        wall: 2000000,
-        spawns: ['Spawn1'],
-        oldPoints: 0,
-        TTU: 0,
-        oldLevel: 1,
-        population: {
-            worker: 0,
-            farmer: 2,
-            carrier: 2,
-            builder: 3,
-            upgrader: 1,
-            claimer: 0,
-            remoteBuilder: 2,
-            reserver: 2,
-            hauler: 2,
-            prospector: 2,
-            mineralFarmer: 1,
-        },
-        linkFrom: [
-            [43, 13],
-            [28, 10]
-        ],
-        linkTo: {
-            x: 35,
-            y: 13
-        },
-        remoteMining: {
-            "Flag1": "E46N41",
-            "Flag2": "E47N42",
-        },
-        mineralType: RESOURCE_HYDROGEN,
-        isSelling: true,
-        energyToTerminal: 0,
-        terminalWithdraw: RESOURCE_LEMERGIUM,
-        labs: {
-            isReacting: false,
-            empty: true,
-            reactant1: ["62af67b28f1878e71f4fd78a", RESOURCE_HYDROGEN],
-            reactant2: ["62afd2d666c4ca2c987437f8", RESOURCE_OXYGEN],
-            product: ["62afc2c460b92e1f44a3e909", RESOURCE_HYDROXIDE]
-        }
-    },
     "E49N43": {
         worker: [MOVE, CARRY, WORK, WORK],
         farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
@@ -93,7 +36,7 @@ const data = {
             reserver: 2,
             hauler: 2,
             prospector: 2,
-            mineralFarmer: 0,
+            mineralFarmer: 1,
         },
         linkFrom: [
             [39, 41],
@@ -107,10 +50,10 @@ const data = {
             "Flag3": "E49N44",
             "Flag4": "E49N42"
         },
-        mineralType: RESOURCE_GHODIUM_OXIDE,
-        isSelling: false,
-        energyToTerminal: 2200,
-        terminalWithdraw: RESOURCE_GHODIUM_OXIDE,
+        mineralType: RESOURCE_KEANIUM,
+        isSelling: true,
+        energyToTerminal: 6000,
+        terminalWithdraw: RESOURCE_KEANIUM,
         labs: {
             isReacting: false,
             empty: false,
@@ -135,7 +78,7 @@ const data = {
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         robber: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        wall: 25000,
+        wall: 100000,
         spawns: ['Spawn3'],
         oldPoints: 0,
         TTU: 0,
@@ -184,18 +127,19 @@ const data = {
     "E59N37": {
         worker: [MOVE, CARRY, WORK, WORK],
         farmer: [MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
-        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY],
-        defenderHi: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        carrier: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        builder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        upgrader: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        defenderHi: [TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+        defenderLo: [MOVE, ATTACK, ATTACK, ATTACK, TOUGH],
         claimer: [MOVE, CLAIM],
-        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY],
+        remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
-        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+        hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
-        wall: 5000,
+        wall: 50000,
         spawns: ['Spawnundefined2'],
         oldPoints: 0,
         TTU: 0,
@@ -204,7 +148,7 @@ const data = {
             worker: 0,
             farmer: 2,
             carrier: 2,
-            builder: 4,
+            builder: 2,
             upgrader: 1,
             claimer: 0,
             remoteBuilder: 0,
@@ -214,12 +158,12 @@ const data = {
             mineralFarmer: 0,
         },
         linkFrom: [
-            [43, 13],
+            [44, 21],
             [28, 10]
         ],
         linkTo: {
-            x: 35,
-            y: 13
+            x: 16,
+            y: 29
         },
         remoteMining: {},
         mineralType: RESOURCE_GHODIUM_OXIDE,
@@ -245,7 +189,7 @@ const data = {
         remoteBuilder: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY],
         reserver: [MOVE, MOVE, CLAIM, CLAIM],
         hauler: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-        prospector: [MOVE, MOVE, MOVE, WORK, WORK, WORK, CARRY],
+        prospector: [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY],
         tester: [MOVE],
         mineralFarmer: [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
         wall: 1000,
@@ -257,12 +201,12 @@ const data = {
             worker: 0,
             farmer: 1,
             carrier: 2,
-            builder: 1,
-            upgrader: 4,
+            builder: 3,
+            upgrader: 1,
             claimer: 0,
             remoteBuilder: 0,
             reserver: 0,
-            hauler: 1,
+            hauler: 2,
             prospector: 1,
             mineralFarmer: 0,
         },
@@ -312,6 +256,7 @@ module.exports.loop = function () {
     roomPlanner('E59N37')
     jobs('E59N37')
     defendRoom('E59N37', 'Spawnundefined2')
+    link('E59N37')
     //============================
 
     //E57N38----------------------
@@ -2125,7 +2070,7 @@ module.exports.findBestOrder = function findBestOrder(resourceType, roomName, en
         let ordersRanked = []
 
         for (order in orders) {
-            let amount = 9473
+            let amount = 10000
             let netCreditCost = (orders[order].price * amount) + (Game.market.calcTransactionCost(amount, roomName, orders[order].roomName) * orders[order].price + 0.1)
             if (amount <= orders[order].amount) {
                 ordersRanked.push([netCreditCost, orders[order].id, Game.market.calcTransactionCost(amount, roomName, orders[order].roomName)])
